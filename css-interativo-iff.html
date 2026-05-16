@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CSS Interativo para Iniciantes</title>
+
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; }
+
+    :root{
+        --navy:#0f172a;
+        --dark:#1e293b;
+        --blue:#3b82f6;
+        --cyan:#06b6d4;
+        --green:#10b981;
+        --amber:#f59e0b;
+        --white:#f8fafc;
+        --muted:#94a3b8;
+        --border:#334155;
+    }
+
+    body{
+        font-family:'Sora', sans-serif;
+        max-width:1100px;
+        margin:auto;
+        padding:28px 24px 48px;
+        background:var(--navy);
+        color:var(--white);
+        min-height:100vh;
+    }
+
+    body::before{
+        content:'';
+        position:fixed;
+        inset:0;
+        background-image:
+            linear-gradient(rgba(6,182,212,.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(6,182,212,.06) 1px, transparent 1px);
+        background-size:48px 48px;
+        pointer-events:none;
+        z-index:0;
+    }
+
+    .header,
+    .step{
+        position:relative;
+        z-index:1;
+    }
+
+    .header{
+        background:linear-gradient(135deg, rgba(59,130,246,.22), rgba(6,182,212,.15));
+        border:1px solid rgba(59,130,246,.4);
+        color:var(--white);
+        padding:28px;
+        border-radius:16px;
+        text-align:center;
+        box-shadow:0 16px 40px rgba(0,0,0,.35);
+        margin-bottom:18px;
+    }
+
+    .header h1{
+        font-size:clamp(1.8rem, 4vw, 2.7rem);
+        margin:0 0 10px;
+        font-weight:800;
+        letter-spacing:.2px;
+    }
+
+    .header p{
+        margin:0;
+        color:var(--muted);
+    }
+
+    .step{
+        background:var(--dark);
+        margin-top:18px;
+        padding:24px;
+        border-radius:16px;
+        border:1px solid var(--border);
+        box-shadow:0 10px 30px rgba(0,0,0,.28);
+    }
+
+    .step h2{
+        margin-top:0;
+        font-size:1.35rem;
+        font-weight:700;
+    }
+
+    .step h3{
+        margin-top:18px;
+        margin-bottom:10px;
+        font-size:1rem;
+    }
+
+    .step p,
+    .step li,
+    .step label{
+        color:#d7e3f4;
+        line-height:1.7;
+    }
+
+    .step ul{
+        padding-left:20px;
+    }
+
+    .step code{
+        font-family:'Space Mono', monospace;
+        font-size:.84rem;
+        color:#7dd3fc;
+        background:#0d1b2e;
+        border:1px solid var(--border);
+        border-radius:6px;
+        padding:2px 7px;
+    }
+
+    .concept{
+        background:rgba(6,182,212,.08);
+        border:1px solid rgba(6,182,212,.28);
+        padding:16px;
+        border-left:4px solid var(--cyan);
+        border-radius:12px;
+        margin-bottom:18px;
+    }
+
+    .concept h3{
+        margin-top:0;
+        color:var(--cyan);
+        font-family:'Space Mono', monospace;
+        font-size:.88rem;
+        letter-spacing:.8px;
+        text-transform:uppercase;
+    }
+
+    .editor{
+        width:100%;
+        height:120px;
+        font-family:'Space Mono', monospace;
+        font-size:.85rem;
+        padding:12px;
+        margin-top:10px;
+        border-radius:10px;
+        border:1px solid var(--border);
+        background:#0d1b2e;
+        color:#7dd3fc;
+        outline:none;
+        resize:vertical;
+    }
+
+    .editor:focus{
+        border-color:var(--cyan);
+        box-shadow:0 0 0 2px rgba(6,182,212,.16);
+    }
+
+    .preview{
+        border:1px dashed var(--border);
+        background:#0d1b2e;
+        color:#cbd5e1;
+        padding:20px;
+        margin-top:20px;
+        min-height:100px;
+        border-radius:12px;
+        overflow:auto;
+    }
+
+    button{
+        margin-top:15px;
+        padding:10px 20px;
+        background:linear-gradient(135deg, var(--blue), var(--cyan));
+        color:white;
+        border:none;
+        cursor:pointer;
+        border-radius:8px;
+        font-weight:700;
+        font-family:'Sora', sans-serif;
+        transition:transform .15s ease, box-shadow .15s ease, opacity .15s ease;
+    }
+
+    button:hover{
+        transform:translateY(-1px);
+        box-shadow:0 10px 18px rgba(6,182,212,.25);
+    }
+
+    .success{
+        display:none;
+        background:rgba(16,185,129,.15);
+        border:1px solid rgba(16,185,129,.4);
+        color:#bbf7d0;
+        padding:12px;
+        margin-top:12px;
+        border-radius:10px;
+    }
+
+    .feedback{
+        display:none;
+        margin-top:12px;
+        padding:12px;
+        border-radius:10px;
+        background:rgba(245,158,11,.12);
+        border:1px solid rgba(245,158,11,.35);
+        color:#fde68a;
+    }
+
+    .step.locked{
+        opacity:.58;
+        pointer-events:none;
+        filter:grayscale(.15);
+    }
+
+    .preview-inline{
+        border:1px dashed rgba(6,182,212,.45);
+        background:rgba(13,27,46,.8);
+    }
+    
+    .topbar{
+        position:sticky;
+        top:0;
+        z-index:100;
+        background:rgba(15,23,42,.9);
+        backdrop-filter:blur(16px);
+        border:1px solid var(--border);
+        border-radius:12px;
+        padding:0 20px;
+        margin-bottom:18px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        height:56px;
+    }
+    
+    .topbar-left{
+        display:flex;
+        align-items:center;
+        gap:16px;
+    }
+    
+    .back-btn{
+        text-decoration:none;
+        color:var(--muted);
+        font-size:13px;
+        display:flex;
+        align-items:center;
+        gap:6px;
+        transition:color .2s;
+    }
+    
+    .back-btn:hover{
+        color:var(--white);
+    }
+    
+    .topbar-pill{
+        font-family:'Space Mono', monospace;
+        font-size:11px;
+        background:rgba(6,182,212,.14);
+        color:var(--cyan);
+        border:1px solid rgba(6,182,212,.35);
+        border-radius:100px;
+        padding:4px 12px;
+        letter-spacing:1px;
+    }
+    
+    .topbar-right{
+        font-family:'Space Mono', monospace;
+        font-size:12px;
+        color:var(--muted);
+    }
+    
+    .footer-nav{
+        position:relative;
+        z-index:1;
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        padding:28px 0 10px;
+        border-top:1px solid var(--border);
+        margin-top:28px;
+        flex-wrap:wrap;
+        gap:16px;
+    }
+    
+    .nav-btn{
+        text-decoration:none;
+        padding:12px 24px;
+        border-radius:10px;
+        font-size:.9rem;
+        font-weight:600;
+        display:flex;
+        align-items:center;
+        gap:8px;
+        transition:transform .2s;
+    }
+    
+    .nav-btn:hover{
+        transform:translateY(-2px);
+    }
+    
+    .nav-prev{
+        background:var(--dark);
+        border:1px solid var(--border);
+        color:var(--muted);
+    }
+    
+    .nav-next{
+        background:var(--blue);
+        color:#fff;
+    }
+</style>
+</head>
+<body>
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-btn">← Voltar</a>
+    <span class="topbar-pill">AULA 05</span>
+  </div>
+  <div class="topbar-right">estrutura-basica.html</div>
+</div>
+
+<div class="header">
+    <h1>Curso Interativo de CSS</h1>
+    <p>Aprenda editando código em tempo real.</p>
+</div>
+
+<!-- ETAPA 1 -->
+<div class="step" id="step1">
+
+<h2>Etapa 1 — Primeiro exercício inline (HTML + CSS)</h2>
+
+<div class="concept">
+<h3>Conceito HTML + CSS</h3>
+<p>
+Primeiro, você vai criar o elemento no HTML e depois estilizar no CSS.
+Isso ajuda a entender a ordem de construção: <strong>1) cria a tag</strong> e <strong>2) aplica o estilo</strong>.
+</p>
+</div>
+
+<h3>O que e o atributo <code>style</code>?</h3>
+<p>
+Tags HTML permitem atributos, que sao como "configuracoes" para cada elemento.
+O atributo <strong>style</strong> aplica CSS diretamente na tag, sem precisar de arquivo separado.
+</p>
+<p>
+Ele e util para testes rapidos e exemplos curtos. Em projetos maiores, prefira CSS separado para manter o codigo organizado e facil de manter.
+</p>
+
+<h3>Exemplos de <code>style</code></h3>
+<ul>
+<li><code>color: blue;</code></li>
+<li><code>color: rgb(0, 0, 255);</code></li>
+<li><code>color: #0000ff;</code></li>
+<li><code>text-align: center;</code></li>
+<li><code>text-align: justify;</code></li>
+<li><code>text-align: left;</code></li>
+<li><code>font-size: 40px;</code></li>
+</ul>
+
+
+<p><b>Tarefa:</b> no campo HTML, crie na tag h1 um atributo <strong>style</strong>. No CSS, deixe azul, tamanho 40px e centralizado.</p>
+
+<label for="html0"><b>HTML:</b></label>
+<textarea class="editor" id="html0" style="height:90px;">
+<h1 style="color: blue;">Meu primeiro titulo inline</h1>
+</textarea>
+
+<label for="css0"><b>CSS:</b></label>
+
+
+<button onclick="executarInline()">Testar Etapa 1</button>
+
+<div class="preview preview-inline" id="preview0">
+Digite o HTML e o CSS acima e clique em Testar.
+</div>
+
+<div class="feedback" id="msg0"></div>
+
+<div class="success" id="ok0">
+✅ Excelente! Você criou a tag e aplicou o CSS corretamente. Etapa 1 liberada.
+</div>
+
+</div>
+
+<!-- ETAPA 1.1 -->
+<div class="step" id="step1_1">
+
+<h2>Etapa 1.1 — Ajustando um &lt;p&gt; (Paragrafo)</h2>
+
+<div class="concept">
+<h3>Conceito HTML + CSS</h3>
+<p>
+Agora vamos repetir a mesma logica da etapa 1: primeiro criar o elemento em HTML e depois ajustar o estilo no CSS.
+</p>
+</div>
+
+<h3>HTML base</h3>
+<p><code>&lt;p&gt;Este e um paragrafo de teste.&lt;/p&gt;</code></p>
+
+<p><b>Exercicio:</b> aplique no paragrafo:</p>
+<ul>
+<li>cor cinza</li>
+<li>tamanho 18px</li>
+<li>fonte Arial</li>
+<li>alinhamento justificado</li>
+</ul>
+<h3>Exemplos de <code>style</code></h3>
+<ul>
+  <li><code>color: gray;</code></li>
+  <li><code>font-size: 18px;</code></li>
+  <li><code>font-family: Arial;</code></li>
+  <li><code>text-align: justify;</code></li>
+</ul>
+
+<p><b>Modo:</b> inline direto no atributo <strong>style</strong> da tag p.</p>
+
+<label for="html11"><b>HTML:</b></label>
+<textarea class="editor" id="html11" style="height:90px;">
+<p style="color: gray;">Este e um paragrafo de teste.</p>
+</textarea>
+
+
+<button onclick="executarEtapa11()">Testar Etapa 1.1</button>
+
+<div class="preview preview-inline" id="preview11">
+Digite o HTML acima e clique em Testar.
+</div>
+
+<div class="feedback" id="msg11"></div>
+
+<div class="success" id="ok11">
+✅ Excelente! Voce ajustou o paragrafo corretamente.
+</div>
+
+</div>
+
+<!-- ETAPA 1.2 -->
+<div class="step" id="step1_2">
+
+<h2>Etapa 1.2 — Estilizando um &lt;input&gt;</h2>
+
+<div class="concept">
+<h3>Conceito HTML + CSS</h3>
+<p>
+Vamos seguir o mesmo modelo da etapa 1.1: voce escreve o HTML e aplica o estilo inline no proprio elemento.
+</p>
+</div>
+
+<h3>HTML base</h3>
+<p><code>&lt;input type="text" placeholder="Digite seu nome"&gt;</code></p>
+
+<p><b>Exercicio:</b> aplique no input:</p>
+<ul>
+<li>largura 300px</li>
+<li>altura 40px</li>
+<li>borda preta</li>
+<li>cantos arredondados</li>
+</ul>
+
+<h3>Exemplos de <code>style</code></h3>
+<ul>
+  <li><code>width: 300px;</code></li>
+  <li><code>height: 40px;</code></li>
+  <li><code>border: 1px solid black;</code></li>
+  <li><code>border-radius: 8px;</code></li>
+</ul>
+
+<p><b>Modo:</b> inline sem id, direto no atributo <strong>style</strong> da tag input.</p>
+
+<label for="html12"><b>HTML:</b></label>
+<textarea class="editor" id="html12" style="height:90px;">
+<input type="text" placeholder="Digite seu nome" style="width: 220px;">
+</textarea>
+
+<button onclick="executarEtapa12()">Testar Etapa 1.2</button>
+
+<div class="preview preview-inline" id="preview12">
+Digite o HTML acima e clique em Testar.
+</div>
+
+<div class="feedback" id="msg12"></div>
+
+<div class="success" id="ok12">
+✅ Excelente! Voce estilizou o input corretamente.
+</div>
+
+</div>
+
+<!-- ETAPA 1.3 -->
+<div class="step" id="step1_3">
+
+<h2>Etapa 1.3 — Mudando fundo de um &lt;button&gt;</h2>
+
+<div class="concept">
+<h3>Conceito HTML + CSS</h3>
+<p>
+Nesta etapa, voce vai estilizar um botao usando CSS inline para praticar cor de fundo e cor do texto.
+</p>
+</div>
+
+<h3>HTML base</h3>
+<p><code>&lt;button&gt;Enviar&lt;/button&gt;</code></p>
+
+<p><b>Exercicio:</b> defina no botao:</p>
+<ul>
+<li>fundo verde</li>
+<li>texto branco</li>
+</ul>
+
+<h3>Exemplos de <code>style</code></h3>
+<ul>
+  <li><code>background-color: green;</code></li>
+  <li><code>color: white;</code></li>
+    <li><code>padding: 10px 14px;</code></li>
+</ul>
+
+<p><b>Modo:</b> inline sem id, direto no atributo <strong>style</strong> da tag button.</p>
+
+<label for="html13"><b>HTML:</b></label>
+<textarea class="editor" id="html13" style="height:90px;">
+<button style="padding: 10px 14px;">Enviar</button>
+</textarea>
+
+<button onclick="executarEtapa13()">Testar Etapa 1.3</button>
+
+<div class="preview preview-inline" id="preview13">
+Digite o HTML acima e clique em Testar.
+</div>
+
+<div class="feedback" id="msg13"></div>
+
+<div class="success" id="ok13">
+✅ Excelente! Voce estilizou o botao corretamente.
+</div>
+
+</div>
+
+<!-- ETAPA 1.4 -->
+<div class="step" id="step1_4">
+
+<h2>Etapa 1.4 — Hover no &lt;button&gt;</h2>
+
+<div class="concept">
+<h3>Objetivo</h3>
+<p>
+Mudar o estilo do botao quando o mouse passar por cima.
+</p>
+</div>
+
+<h3>HTML base</h3>
+<p><code>&lt;button&gt;Enviar&lt;/button&gt;</code></p>
+
+<p><b>Exercicio:</b> em modo inline, mude o fundo para <strong>darkgreen</strong> quando o mouse passar no botao.</p>
+
+<p><b>Modo:</b> inline sem id, usando atributos da propria tag button.</p>
+
+<label for="html14"><b>HTML:</b></label>
+<textarea class="editor" id="html14" style="height:90px;">
+<button style="background-color: green; color: white;" onmouseover="this.style.backgroundColor='darkgreen'" onmouseout="this.style.backgroundColor='green'">Enviar</button>
+</textarea>
+
+<button onclick="executarEtapa14()">Testar Etapa 1.4</button>
+
+<div class="preview preview-inline" id="preview14">
+Digite o HTML acima, clique em Testar e passe o mouse no botao da previa.
+</div>
+
+<div class="feedback" id="msg14"></div>
+
+<div class="success" id="ok14">
+✅ Excelente! Hover aplicado com sucesso.
+</div>
+
+</div>
+
+<!-- ETAPA 2 -->
+<div class="step" id="step2">
+
+<h2>Etapa 2 — Primeiro exercício com id (HTML + CSS)</h2>
+
+<div class="concept">
+<h3>Conceito HTML + CSS</h3>
+<p>
+Primeiro, você vai criar o elemento no HTML e depois estilizar no CSS.
+Isso ajuda a entender a ordem de construção: <strong>1) cria a tag</strong> e <strong>2) aplica o estilo</strong>.
+</p>
+</div>
+
+<p><b>Tarefa:</b> no campo HTML, crie um h1 com id <strong>tituloInline</strong>. No CSS, deixe azul, tamanho 40px e centralizado.</p>
+
+<label for="html0"><b>HTML:</b></label>
+<textarea class="editor" id="html0" style="height:90px;">
+<h1 id="tituloInline">Meu primeiro titulo inline</h1>
+</textarea>
+
+<label for="css0"><b>CSS:</b></label>
+<textarea class="editor" id="css0">
+#tituloInline{
+
+}
+</textarea>
+
+<!-- FOOTER NAV -->
+<div class="footer-nav">
+    <a href="titulos-e-textos.html" class="nav-btn nav-prev">← Aula anterior: Títulos e Textos</a>
+    <a href="links-imagens.html" class="nav-btn nav-next">Ver todas as aulas →</a>
+</div>
+<button onclick="executarInline()">Testar Etapa 2</button>
+
+<div class="preview preview-inline" id="preview0">
+Digite o HTML e o CSS acima e clique em Testar.
+</div>
+
+<div class="feedback" id="msg0"></div>
+
+<div class="success" id="ok0">
+✅ Excelente! Você criou a tag e aplicou o CSS corretamente. Etapa 2 liberada.
+</div>
+
+</div>
+
+<!-- ETAPA 3 -->
+<div class="step" id="step3">
+
+<h2>Etapa 3 — Trabalhando com classes</h2>
+
+<div class="concept">
+<h3>Conceito HTML + CSS</h3>
+<p>
+Uma classe permite estilizar elementos reutilizaveis.
+No HTML usamos <strong>class="destaque"</strong> e no CSS usamos <strong>.destaque</strong>.
+</p>
+</div>
+
+<h3>HTML base</h3>
+<p><code>&lt;p class="destaque"&gt;Texto importante&lt;/p&gt;</code></p>
+
+<label for="html3"><b>HTML:</b></label>
+<textarea class="editor" id="html3" style="height:90px;">
+<p class="destaque">Texto importante</p>
+</textarea>
+
+<label for="css3"><b>CSS:</b></label>
+<textarea class="editor" id="css3">
+.destaque{
+
+}
+</textarea>
+
+<button onclick="executarEtapa3()">Testar Etapa 3</button>
+
+<div class="preview preview-inline" id="preview3">
+Digite o HTML e o CSS acima e clique em Testar.
+</div>
+
+<div class="feedback" id="msg3"></div>
+
+<div class="success" id="ok3">
+✅ Excelente! A classe destaque foi aplicada corretamente.
+</div>
+
+</div>
+
+<!-- ETAPA 4 -->
+<div class="step" id="step4">
+
+<h2>Etapa 4 — Criando um formulario simples</h2>
+
+<div class="concept">
+<h3>Conceito HTML + CSS</h3>
+<p>
+Agora voce vai montar um pequeno formulario com titulo, dois campos e um botao, aplicando estilos basicos para organizacao visual.
+</p>
+</div>
+
+<h3>HTML base</h3>
+<p><code>&lt;h1&gt;Cadastro&lt;/h1&gt;</code></p>
+<p><code>&lt;input type="text" placeholder="Nome"&gt;</code></p>
+<p><code>&lt;input type="email" placeholder="Email"&gt;</code></p>
+<p><code>&lt;button&gt;Salvar&lt;/button&gt;</code></p>
+
+<label for="html4"><b>HTML:</b></label>
+<textarea class="editor" id="html4" style="height:120px;">
+<h1>Cadastro</h1>
+<input type="text" placeholder="Nome">
+<input type="email" placeholder="Email">
+<button>Salvar</button>
+</textarea>
+
+<label for="css4"><b>CSS:</b></label>
+<textarea class="editor" id="css4">
+body {
+    font-family: Arial;
+}
+
+h1 {
+    color: blue;
+}
+
+input {
+    display: block;
+    margin-bottom: 10px;
+    padding: 8px;
+}
+
+button {
+    background: blue;
+    color: white;
+    padding: 10px;
+}
+</textarea>
+
+<button onclick="executarEtapa4()">Testar Etapa 4</button>
+
+<div class="preview preview-inline" id="preview4">
+Digite o HTML e o CSS acima e clique em Testar.
+</div>
+
+<div class="feedback" id="msg4"></div>
+
+<div class="success" id="ok4">
+✅ Excelente! Formulario estilizado corretamente.
+</div>
+
+</div>
+
+
+
+
+<script>
+function normalizarCor(valor){
+    if(!valor) return "";
+    return valor.replace(/\s+/g, "").toLowerCase();
+}
+
+function ehAzul(valor){
+    const cor = normalizarCor(valor);
+    return cor === "blue" || cor === "rgb(0,0,255)";
+}
+
+function ehCinza(valor){
+    const cor = normalizarCor(valor);
+    return cor === "gray" || cor === "grey" || cor === "rgb(128,128,128)";
+}
+
+function ehPreto(valor){
+    const cor = normalizarCor(valor);
+    return cor === "black" || cor === "rgb(0,0,0)";
+}
+
+function ehVerde(valor){
+    const cor = normalizarCor(valor);
+    return cor === "green" || cor === "rgb(0,128,0)";
+}
+
+function ehBranco(valor){
+    const cor = normalizarCor(valor);
+    return cor === "white" || cor === "rgb(255,255,255)";
+}
+
+function ehVermelho(valor){
+    const cor = normalizarCor(valor);
+    return cor === "red" || cor === "rgb(255,0,0)";
+}
+
+function mostrarMensagem(id, texto){
+    const box = document.getElementById(id);
+    box.style.display = "block";
+    box.textContent = texto;
+}
+
+function esconderMensagem(id){
+    const box = document.getElementById(id);
+    box.style.display = "none";
+    box.textContent = "";
+}
+
+function liberarEtapa(numero){
+    const etapa = document.getElementById("step" + numero);
+    if(etapa) etapa.classList.remove("locked");
+}
+
+function executarInline(){
+    const html = document.getElementById("html0").value;
+    const css = document.getElementById("css0").value;
+    const preview = document.getElementById("preview0");
+
+    preview.innerHTML = html;
+
+    let antigo = document.getElementById("styleTemp0");
+    if(antigo) antigo.remove();
+
+    let style = document.createElement("style");
+    style.id = "styleTemp0";
+    style.innerHTML = css;
+    document.head.appendChild(style);
+
+    const titulo = preview.querySelector("#tituloInline");
+    if(!titulo || titulo.tagName !== "H1"){
+        esconderMensagem("ok0");
+        mostrarMensagem("msg0", "Crie no HTML um h1 com id tituloInline para continuar.");
+        return;
+    }
+
+    const estilo = getComputedStyle(titulo);
+    const okCor = ehAzul(estilo.color);
+    const okFonte = estilo.fontSize === "40px";
+    const okAlinhado = estilo.textAlign === "center";
+
+    if(okCor && okFonte && okAlinhado){
+        esconderMensagem("msg0");
+        document.getElementById("ok0").style.display = "block";
+        liberarEtapa(1);
+    }else{
+        esconderMensagem("ok0");
+        mostrarMensagem("msg0", "Quase la: confirme no CSS color blue, font-size 40px e text-align center.");
+    }
+}
+
+function executarEtapa11(){
+    const html = document.getElementById("html11").value;
+    const preview = document.getElementById("preview11");
+
+    preview.innerHTML = html;
+
+    const paragrafo = preview.querySelector("p");
+    if(!paragrafo || paragrafo.tagName !== "P"){
+        esconderMensagem("ok11");
+        mostrarMensagem("msg11", "Crie no HTML uma tag p para continuar.");
+        return;
+    }
+
+    const estilo = getComputedStyle(paragrafo);
+    const fonte = estilo.fontFamily.toLowerCase();
+    const fonteOk = fonte.includes("arial");
+    const okCor = ehCinza(estilo.color);
+    const okFonte = estilo.fontSize === "18px";
+    const okAlinhado = estilo.textAlign === "justify";
+
+    if(okCor && okFonte && fonteOk && okAlinhado){
+        esconderMensagem("msg11");
+        document.getElementById("ok11").style.display = "block";
+    }else{
+        esconderMensagem("ok11");
+        mostrarMensagem("msg11", "Quase la: no style do p use color gray, font-size 18px, font-family Arial e text-align justify.");
+    }
+}
+
+function executarEtapa12(){
+    const html = document.getElementById("html12").value;
+    const preview = document.getElementById("preview12");
+
+    preview.innerHTML = html;
+
+    const campo = preview.querySelector("input");
+    if(!campo || campo.tagName !== "INPUT"){
+        esconderMensagem("ok12");
+        mostrarMensagem("msg12", "Crie no HTML uma tag input para continuar.");
+        return;
+    }
+
+    const estilo = getComputedStyle(campo);
+    const larguraOk = estilo.width === "300px";
+    const alturaOk = estilo.height === "40px";
+    const bordaPreta = ehPreto(estilo.borderTopColor);
+    const bordaArredondada = estilo.borderTopLeftRadius === "8px";
+
+    if(larguraOk && alturaOk && bordaPreta && bordaArredondada){
+        esconderMensagem("msg12");
+        document.getElementById("ok12").style.display = "block";
+    }else{
+        esconderMensagem("ok12");
+        mostrarMensagem("msg12", "Quase la: no style do input use width 300px, height 40px, border 1px solid black e border-radius 8px.");
+    }
+}
+
+function executarEtapa13(){
+    const html = document.getElementById("html13").value;
+    const preview = document.getElementById("preview13");
+
+    preview.innerHTML = html;
+
+    const botao = preview.querySelector("button");
+    if(!botao || botao.tagName !== "BUTTON"){
+        esconderMensagem("ok13");
+        mostrarMensagem("msg13", "Crie no HTML uma tag button para continuar.");
+        return;
+    }
+
+    const estilo = getComputedStyle(botao);
+    const fundoVerde = ehVerde(estilo.backgroundColor);
+    const textoBranco = ehBranco(estilo.color);
+
+    if(fundoVerde && textoBranco){
+        esconderMensagem("msg13");
+        document.getElementById("ok13").style.display = "block";
+    }else{
+        esconderMensagem("ok13");
+        mostrarMensagem("msg13", "Quase la: no style do button use background-color green e color white.");
+    }
+}
+
+function executarEtapa14(){
+    const html = document.getElementById("html14").value;
+    const preview = document.getElementById("preview14");
+
+    preview.innerHTML = html;
+
+    const botao = preview.querySelector("button");
+    if(!botao || botao.tagName !== "BUTTON"){
+        esconderMensagem("ok14");
+        mostrarMensagem("msg14", "Crie no HTML uma tag button para continuar.");
+        return;
+    }
+
+    const onmouseover = (botao.getAttribute("onmouseover") || "").toLowerCase();
+    const temHoverInline = onmouseover.includes("backgroundcolor") || onmouseover.includes("background-color");
+    const temDarkGreen = onmouseover.includes("darkgreen") || onmouseover.includes("#006400") || onmouseover.includes("0,100,0");
+
+    if(temHoverInline && temDarkGreen){
+        esconderMensagem("msg14");
+        document.getElementById("ok14").style.display = "block";
+    }else{
+        esconderMensagem("ok14");
+        mostrarMensagem("msg14", "Quase la: no button use onmouseover para trocar o fundo para darkgreen.");
+    }
+}
+
+function executarEtapa3(){
+    const html = document.getElementById("html3").value;
+    const css = document.getElementById("css3").value;
+    const preview = document.getElementById("preview3");
+
+    preview.innerHTML = html;
+
+    let antigo = document.getElementById("styleTemp3");
+    if(antigo) antigo.remove();
+
+    let style = document.createElement("style");
+    style.id = "styleTemp3";
+    style.innerHTML = css;
+    document.head.appendChild(style);
+
+    const destaque = preview.querySelector(".destaque");
+    if(!destaque){
+        esconderMensagem("ok3");
+        mostrarMensagem("msg3", "Crie no HTML um elemento com class destaque para continuar.");
+        return;
+    }
+
+    const estilo = getComputedStyle(destaque);
+    const corOk = ehVermelho(estilo.color);
+    const peso = parseInt(estilo.fontWeight, 10);
+    const pesoOk = estilo.fontWeight === "bold" || (!isNaN(peso) && peso >= 700);
+
+    if(corOk && pesoOk){
+        esconderMensagem("msg3");
+        document.getElementById("ok3").style.display = "block";
+    }else{
+        esconderMensagem("ok3");
+        mostrarMensagem("msg3", "Quase la: em .destaque use color red e font-weight bold.");
+    }
+}
+
+function executarEtapa4(){
+    const html = document.getElementById("html4").value;
+    const css = document.getElementById("css4").value;
+    const preview = document.getElementById("preview4");
+
+    preview.innerHTML = html;
+
+    let antigo = document.getElementById("styleTemp4");
+    if(antigo) antigo.remove();
+
+    let style = document.createElement("style");
+    style.id = "styleTemp4";
+    style.innerHTML = css;
+    document.head.appendChild(style);
+
+    const titulo = preview.querySelector("h1");
+    const inputs = preview.querySelectorAll("input");
+    const botao = preview.querySelector("button");
+
+    if(!titulo || inputs.length < 2 || !botao){
+        esconderMensagem("ok4");
+        mostrarMensagem("msg4", "Crie no HTML: h1, dois inputs e um button para continuar.");
+        return;
+    }
+
+    const estiloTitulo = getComputedStyle(titulo);
+    const estiloInput = getComputedStyle(inputs[0]);
+    const estiloBotao = getComputedStyle(botao);
+
+    const h1Azul = ehAzul(estiloTitulo.color);
+    const inputDisplay = estiloInput.display === "block";
+    const inputMargin = estiloInput.marginBottom === "10px";
+    const inputPadding = estiloInput.paddingTop === "8px" && estiloInput.paddingRight === "8px" && estiloInput.paddingBottom === "8px" && estiloInput.paddingLeft === "8px";
+    const botaoFundoAzul = ehAzul(estiloBotao.backgroundColor);
+    const botaoTextoBranco = ehBranco(estiloBotao.color);
+    const botaoPadding = estiloBotao.paddingTop === "10px" && estiloBotao.paddingRight === "10px" && estiloBotao.paddingBottom === "10px" && estiloBotao.paddingLeft === "10px";
+
+    if(h1Azul && inputDisplay && inputMargin && inputPadding && botaoFundoAzul && botaoTextoBranco && botaoPadding){
+        esconderMensagem("msg4");
+        document.getElementById("ok4").style.display = "block";
+    }else{
+        esconderMensagem("ok4");
+        mostrarMensagem("msg4", "Quase la: revise os estilos de h1, input (display, margin-bottom, padding) e button (fundo azul, texto branco, padding 10px).");
+    }
+}
+
+function executar(n){
+
+    if(n > 1){
+        const etapaAnterior = document.getElementById("step" + (n - 1));
+        if(etapaAnterior.classList.contains("locked")){
+            mostrarMensagem("msg" + n, "Complete a etapa anterior para liberar esta atividade.");
+            return;
+        }
+    }
+
+    let css = document.getElementById("css"+n).value;
+
+    let antigo = document.getElementById("styleTemp");
+    if(antigo) antigo.remove();
+
+    let style = document.createElement("style");
+    style.id="styleTemp";
+    style.innerHTML=css;
+    document.head.appendChild(style);
+
+    let valido = false;
+
+    if(n === 1){
+        const titulo = document.getElementById("titulo");
+        const estilo = getComputedStyle(titulo);
+        valido = ehAzul(estilo.color) && estilo.fontSize === "40px" && estilo.textAlign === "center";
+    }
+
+    if(n === 2){
+        const paragrafo = document.getElementById("paragrafo");
+        const estilo = getComputedStyle(paragrafo);
+        valido = ehAzul(estilo.color) && estilo.fontSize === "24px";
+    }
+
+    if(n === 3){
+        const campo = document.getElementById("campo");
+        const estilo = getComputedStyle(campo);
+        const larguraOk = estilo.width === "300px";
+        const bordaAzul = ehAzul(estilo.borderTopColor);
+        valido = larguraOk && bordaAzul;
+    }
+
+    if(valido){
+        esconderMensagem("msg"+n);
+        document.getElementById("ok"+n).style.display="block";
+        liberarEtapa(n + 1);
+    }else{
+        document.getElementById("ok"+n).style.display="none";
+        mostrarMensagem("msg"+n, "Ainda nao ficou certo. Revise a tarefa e tente novamente.");
+    }
+}
+</script>
+
+</body>
+</html>

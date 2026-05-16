@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 04 — Formulários</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0f172a;
+      --dark:   #1e293b;
+      --panel:  #1a2744;
+      --blue:   #3b82f6;
+      --cyan:   #06b6d4;
+      --amber:  #f59e0b;
+      --green:  #10b981;
+      --red:    #ef4444;
+      --purple: #a78bfa;
+      --white:  #f8fafc;
+      --muted:  #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(139,92,246,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,92,246,.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .back-btn {
+      text-decoration: none; color: var(--muted); font-size: 13px;
+      display: flex; align-items: center; gap: 6px; transition: color .2s;
+    }
+    .back-btn:hover { color: var(--white); }
+    .topbar-pill {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      background: rgba(6,182,212,.15); color: var(--cyan);
+      border: 1px solid rgba(6,182,212,.3); border-radius: 100px;
+      padding: 4px 12px; letter-spacing: 1px;
+    }
+    .topbar-right { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+
+    /* ── LAYOUT ── */
+    .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    .page-header { padding: 48px 0 40px; }
+    .lesson-tag {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--cyan);
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .page-header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 12px; }
+    .page-header p  { font-size: 1rem; color: var(--muted); line-height: 1.7; max-width: 640px; }
+
+    /* ── SEC TITLES ── */
+    .sec-title {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--cyan);
+      text-transform: uppercase; margin-bottom: 12px; margin-top: 48px;
+    }
+    .sec-h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; color: var(--white); }
+
+    /* ── ANATOMIA ── */
+    .demo-section {
+      background: var(--dark); border: 1px solid rgba(6,182,212,.25);
+      border-radius: 16px; padding: 28px; margin-bottom: 36px;
+    }
+    .demo-section h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; }
+
+    /* ── FORM VISUALIZER ── */
+    .form-visual {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; margin-bottom: 36px;
+    }
+    .fv-header {
+      background: #0d1b2e; padding: 12px 20px;
+      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+    .fv-row {
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--border); cursor: pointer;
+      transition: background .15s;
+    }
+    .fv-row:last-child { border-bottom: none; }
+    .fv-row:hover { background: rgba(6,182,212,.06); }
+    .fv-tag {
+      width: 160px; flex-shrink: 0;
+      padding: 14px 18px;
+      font-family: 'Space Mono', monospace; font-weight: 700;
+      color: var(--cyan); font-size: 11px;
+      border-right: 1px solid var(--border);
+    }
+    .fv-preview {
+      padding: 14px 20px; flex: 1;
+    }
+    .fv-preview input,
+    .fv-preview select,
+    .fv-preview textarea,
+    .fv-preview button {
+      font-family: 'Sora', sans-serif; font-size: .85rem;
+      pointer-events: none;
+    }
+    .fv-preview input[type="text"],
+    .fv-preview input[type="email"],
+    .fv-preview input[type="password"],
+    .fv-preview input[type="number"],
+    .fv-preview input[type="date"] {
+      padding: 6px 10px; border: 1px solid #475569;
+      border-radius: 6px; background: #0d1b2e; color: var(--white);
+      width: 220px;
+    }
+    .fv-preview select {
+      padding: 6px 10px; border: 1px solid #475569;
+      border-radius: 6px; background: #0d1b2e; color: var(--white);
+    }
+    .fv-preview textarea {
+      padding: 6px 10px; border: 1px solid #475569;
+      border-radius: 6px; background: #0d1b2e; color: var(--white);
+      resize: none; width: 220px; height: 50px;
+    }
+    .fv-preview button {
+      padding: 7px 18px; border-radius: 6px; border: none;
+      background: var(--blue); color: #fff; font-weight: 700; cursor: pointer;
+    }
+    .fv-preview label { color: var(--white); font-size: .85rem; margin-right: 6px; }
+    .fv-use {
+      padding: 0 18px; flex-shrink: 0;
+      font-family: 'Space Mono', monospace; font-size: 10px;
+      color: var(--cyan); opacity: 0; transition: opacity .15s;
+    }
+    .fv-row:hover .fv-use { opacity: 1; }
+
+    /* ── TAG CARDS ── */
+    .tags-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin-bottom: 48px;
+    }
+    .tag-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .tag-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
+    .tag-code {
+      font-family: 'Space Mono', monospace; font-size: 13px;
+      font-weight: 700; margin-bottom: 8px;
+    }
+    .tag-card .preview { margin-bottom: 10px; font-size: .85rem; }
+    .tag-card p { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+    .load-tag-btn {
+      display: inline-block; margin-top: 10px;
+      font-size: 10px; padding: 3px 10px; border-radius: 100px;
+      background: var(--cyan); color: var(--navy);
+      border: none; cursor: pointer; font-weight: 700;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── INTERACTIVE DEMO ── */
+    .demo-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+    .demo-input {
+      background: #0d1b2e; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; color: var(--white); font-family: 'Sora', sans-serif;
+      font-size: .9rem; flex: 1; min-width: 180px; outline: none;
+      transition: border-color .2s;
+    }
+    .demo-input:focus { border-color: var(--cyan); }
+    .demo-select {
+      background: #0d1b2e; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; color: var(--white); font-family: 'Space Mono', monospace;
+      font-size: .85rem; outline: none; cursor: pointer;
+    }
+    .demo-preview-box {
+      background: #fff; border-radius: 10px; padding: 24px 28px;
+      min-height: 80px; display: flex; align-items: center;
+    }
+
+    /* ── EXAMPLES GRID ── */
+    .examples-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 48px;
+    }
+    .ex-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .ex-card:hover { border-color: var(--cyan); transform: translateY(-3px); }
+    .ex-card.active { border-color: var(--cyan); box-shadow: 0 0 0 2px rgba(6,182,212,.2); }
+    .ex-card-head {
+      padding: 16px 18px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ex-card-head h3 { font-size: .95rem; font-weight: 700; }
+    .use-btn {
+      font-size: 11px; padding: 4px 12px; border-radius: 100px;
+      background: var(--cyan); color: var(--navy);
+      border: none; cursor: pointer; font-weight: 700;
+      font-family: 'Space Mono', monospace; transition: opacity .2s;
+    }
+    .use-btn:hover { opacity: .85; }
+    .ex-code {
+      background: #0d1b2e; padding: 14px 18px;
+      font-family: 'Space Mono', monospace; font-size: 11.5px; line-height: 1.7;
+      color: #7dd3fc; white-space: pre; overflow-x: auto;
+    }
+    .ex-desc { padding: 12px 18px 16px; font-size: .8rem; color: var(--muted); }
+
+    /* ── PLAYGROUND ── */
+    .playground {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; margin-bottom: 56px;
+    }
+    .playground-header {
+      background: #0d1b2e; padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .pg-title { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+    .run-btn {
+      background: var(--green); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 8px 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: background .2s; font-family: 'Sora', sans-serif;
+    }
+    .run-btn:hover { background: #059669; }
+    .playground-body {
+      display: grid; grid-template-columns: 1fr 1fr; min-height: 420px;
+    }
+    @media(max-width: 700px) { .playground-body { grid-template-columns: 1fr; } }
+    .pg-editor { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .pg-editor-tabs {
+      display: flex; border-bottom: 1px solid var(--border); background: #0d1b2e;
+    }
+    .pg-tab {
+      padding: 10px 18px; font-family: 'Space Mono', monospace; font-size: 11px;
+      color: var(--muted); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+    }
+    .pg-tab.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .pg-textarea {
+      flex: 1; background: #0d1b2e; border: none; outline: none;
+      color: #7dd3fc; font-family: 'Space Mono', monospace;
+      font-size: 12.5px; line-height: 1.8;
+      padding: 20px; resize: none; width: 100%; min-height: 380px;
+    }
+    .pg-result { display: flex; flex-direction: column; }
+    .pg-result-label {
+      padding: 10px 18px;
+      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: var(--dark);
+    }
+    .pg-iframe { flex: 1; border: none; background: #fff; min-height: 380px; width: 100%; }
+
+    /* ── QUIZ ── */
+    .quiz-section {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; margin-bottom: 48px;
+    }
+    .quiz-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+    .quiz-item { margin-bottom: 24px; }
+    .quiz-item p { font-size: .9rem; font-weight: 600; margin-bottom: 12px; }
+    .quiz-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quiz-opt {
+      padding: 8px 18px; border-radius: 8px;
+      background: #0d1b2e; border: 1px solid var(--border);
+      cursor: pointer; font-size: .85rem; color: var(--white);
+      transition: border-color .2s, background .2s;
+      font-family: 'Space Mono', monospace;
+    }
+    .quiz-opt:hover { border-color: var(--cyan); }
+    .quiz-opt.correct { background: rgba(16,185,129,.2); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong   { background: rgba(239,68,68,.15); border-color: var(--red); color: var(--red); }
+    .quiz-feedback { font-size: .8rem; margin-top: 8px; min-height: 18px; }
+    .quiz-feedback.ok  { color: var(--green); }
+    .quiz-feedback.err { color: var(--red); }
+
+    /* ── EXERCISE ── */
+    .exercise-section {
+      background: #0b1f2e; border: 1px solid rgba(6,182,212,.25);
+      border-radius: 16px; padding: 32px; margin-bottom: 56px;
+    }
+    .exercise-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(6,182,212,.15); color: var(--cyan);
+      border: 1px solid rgba(6,182,212,.3);
+      border-radius: 100px; padding: 6px 16px;
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      font-weight: 700; letter-spacing: 1px; margin-bottom: 18px;
+    }
+    .exercise-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+    .exercise-section > p { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 24px; }
+    .task-list { list-style: none; margin-bottom: 28px; }
+    .task-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(6,182,212,.1);
+      font-size: .9rem;
+    }
+    .task-list li:last-child { border-bottom: none; }
+    .task-num {
+      flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(6,182,212,.2); color: var(--cyan);
+      font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .answer-toggle {
+      background: rgba(6,182,212,.1); border: 1px solid rgba(6,182,212,.25);
+      border-radius: 10px; padding: 14px 18px; cursor: pointer;
+      font-size: .9rem; color: var(--cyan); font-weight: 600;
+      width: 100%; text-align: left; display: flex; align-items: center; gap: 8px;
+    }
+    .answer-body {
+      background: #0d1b2e; border: 1px solid rgba(6,182,212,.15);
+      border-top: none; border-radius: 0 0 10px 10px;
+      padding: 18px; display: none;
+    }
+    .answer-body.open { display: block; }
+    .answer-body pre { font-family: 'Space Mono', monospace; font-size: 12px; color: #7dd3fc; line-height: 1.7; }
+
+    /* ── INFO BOX ── */
+    .info-box {
+      background: rgba(6,182,212,.08); border: 1px solid rgba(6,182,212,.25);
+      border-left: 4px solid var(--cyan); border-radius: 10px;
+      padding: 16px 20px; margin-bottom: 28px;
+      font-size: .9rem; color: var(--white); line-height: 1.7;
+    }
+    .info-box strong { color: var(--cyan); }
+
+    .warn-box {
+      background: rgba(245,158,11,.08); border: 1px solid rgba(245,158,11,.25);
+      border-left: 4px solid var(--amber); border-radius: 10px;
+      padding: 16px 20px; margin-bottom: 28px;
+      font-size: .9rem; color: var(--white); line-height: 1.7;
+    }
+    .warn-box strong { color: var(--amber); }
+
+    /* ── FOOTER NAV ── */
+    .footer-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 32px 0 48px; border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: 16px;
+    }
+    .nav-btn {
+      text-decoration: none; padding: 12px 24px;
+      border-radius: 10px; font-size: .9rem; font-weight: 600;
+      display: flex; align-items: center; gap: 8px; transition: transform .2s;
+    }
+    .nav-btn:hover { transform: translateY(-2px); }
+    .nav-prev { background: var(--dark); border: 1px solid var(--border); color: var(--muted); }
+    .nav-next { background: var(--blue); color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn">← Voltar</a>
+      <span class="topbar-pill">AULA 04</span>
+    </div>
+    <div class="topbar-right">formulario.html</div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="lesson-tag">▸ Aula 04 de 05</div>
+      <h1>📋 Formulários HTML</h1>
+      <p>Aprenda a criar formulários para coletar dados do usuário. Campos de texto, senhas, seleções, botões e muito mais — tudo com as tags certas.</p>
+    </div>
+
+    <!-- O QUE É UM FORMULÁRIO -->
+    <div class="sec-title">▸ entenda o conceito</div>
+    <div class="sec-h2">O que é um Formulário HTML?</div>
+
+    <p style="color:var(--muted); line-height:1.8; margin-bottom: 20px;">
+      Formulários são usados para coletar informações do usuário e enviá-las para um servidor. Login, cadastro, pesquisa, pagamento — tudo isso usa formulários!
+    </p>
+
+    <div class="info-box">
+      <strong>🔑 A tag principal:</strong> Todo formulário começa com <code style="color:var(--cyan)">&lt;form&gt;</code> e termina com <code style="color:var(--cyan)">&lt;/form&gt;</code>. Dentro dela ficam todos os campos (inputs).
+    </div>
+
+    <!-- ANATOMIA DO FORM -->
+    <div class="sec-title">▸ anatomia de um formulário</div>
+    <div class="sec-h2">Estrutura básica de um &lt;form&gt;</div>
+
+    <div class="demo-section" style="background: #0d1b2e; border: 1px solid rgba(6,182,212,.25);">
+      <div style="display: flex; gap: 32px; align-items: flex-start; justify-content: center; flex-wrap: wrap;">
+
+        <div style="text-align: center;">
+          <div style="padding: 12px 20px; border-radius: 6px; background: #1f3b5c; font-size: 16px; min-width: 180px; color: #6bffb0; font-weight: bold; font-family: 'Space Mono', monospace;">&lt;form&gt;</div>
+          <div style="height: 16px; width: 2px; background: #6bffb0; margin: 6px auto;"></div>
+          <div style="font-size: 13px; color: #6bffb0; opacity: 0.9;">Abre o formulário</div>
+        </div>
+
+        <div style="text-align: center;">
+          <div style="padding: 12px 20px; border-radius: 6px; background: #1f3b5c; font-size: 16px; min-width: 180px; color: #bcd7ff; font-family: 'Space Mono', monospace;">&lt;label&gt; + &lt;input&gt;</div>
+          <div style="height: 16px; width: 2px; background: #bcd7ff; margin: 6px auto;"></div>
+          <div style="font-size: 13px; color: #bcd7ff; opacity: 0.9;">Rótulo + Campo</div>
+        </div>
+
+        <div style="text-align: center;">
+          <div style="padding: 12px 20px; border-radius: 6px; background: #1f3b5c; font-size: 16px; min-width: 180px; color: #fbbf24; font-family: 'Space Mono', monospace;">&lt;button&gt;</div>
+          <div style="height: 16px; width: 2px; background: #fbbf24; margin: 6px auto;"></div>
+          <div style="font-size: 13px; color: #fbbf24; opacity: 0.9;">Botão de envio</div>
+        </div>
+
+        <div style="text-align: center;">
+          <div style="padding: 12px 20px; border-radius: 6px; background: #1f3b5c; font-size: 16px; min-width: 180px; color: #ff7a7a; font-weight: bold; font-family: 'Space Mono', monospace;">&lt;/form&gt;</div>
+          <div style="height: 16px; width: 2px; background: #ff7a7a; margin: 6px auto;"></div>
+          <div style="font-size: 13px; color: #ff7a7a; opacity: 0.9;">Fecha o formulário</div>
+        </div>
+
+      </div>
+
+      <div style="margin-top: 28px; background: #162032; border-radius: 10px; padding: 20px; font-family: 'Space Mono', monospace; font-size: 12.5px; color: #7dd3fc; line-height: 1.9;">
+        <span style="color:#6bffb0">&lt;form&gt;</span><br>
+        &nbsp;&nbsp;<span style="color:#a5b4fc">&lt;label&gt;</span>Nome:<span style="color:#a5b4fc">&lt;/label&gt;</span><br>
+        &nbsp;&nbsp;<span style="color:#bcd7ff">&lt;input type="text" name="nome"&gt;</span><br>
+        &nbsp;&nbsp;<span style="color:#fbbf24">&lt;button type="submit"&gt;</span>Enviar<span style="color:#fbbf24">&lt;/button&gt;</span><br>
+        <span style="color:#ff7a7a">&lt;/form&gt;</span>
+      </div>
+    </div>
+
+    <!-- DEMO INTERATIVO -->
+    <div class="sec-title">▸ demonstração ao vivo</div>
+    <div class="sec-h2">Monte seu campo e veja o resultado</div>
+
+    <div class="demo-section">
+      <h3>🔧 Escolha o tipo de campo:</h3>
+      <div class="demo-controls">
+        <input class="demo-input" id="demoLabel" type="text" value="Seu Nome" placeholder="Texto do label...">
+        <select class="demo-select" id="demoType">
+          <option value="text">type="text" — Texto</option>
+          <option value="email">type="email" — E-mail</option>
+          <option value="password">type="password" — Senha</option>
+          <option value="number">type="number" — Número</option>
+          <option value="date">type="date" — Data</option>
+          <option value="checkbox">type="checkbox" — Caixa</option>
+          <option value="radio">type="radio" — Opção</option>
+        </select>
+        <input class="demo-input" id="demoPlaceholder" type="text" value="Digite aqui..." placeholder="Placeholder..." style="max-width: 200px;">
+      </div>
+      <div class="demo-preview-box">
+        <div id="demoOutput" style="font-family: Arial, sans-serif;"></div>
+      </div>
+    </div>
+
+    <!-- VISUALIZADOR DE TIPOS -->
+    <div class="sec-title">▸ tipos de input</div>
+    <div class="sec-h2">Clique em qualquer linha para carregar no playground</div>
+
+    <div class="form-visual">
+      <div class="fv-header">TIPO DO INPUT → COMPORTAMENTO VISUAL (clique para usar no playground)</div>
+
+      <div class="fv-row" data-input="text">
+        <div class="fv-tag">type="text"</div>
+        <div class="fv-preview"><label>Nome:</label><input type="text" value="João Silva"></div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="email">
+        <div class="fv-tag">type="email"</div>
+        <div class="fv-preview"><label>E-mail:</label><input type="email" value="joao@email.com"></div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="password">
+        <div class="fv-tag">type="password"</div>
+        <div class="fv-preview"><label>Senha:</label><input type="password" value="segredo123"></div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="number">
+        <div class="fv-tag">type="number"</div>
+        <div class="fv-preview"><label>Idade:</label><input type="number" value="18"></div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="date">
+        <div class="fv-tag">type="date"</div>
+        <div class="fv-preview"><label>Nascimento:</label><input type="date" value="2000-01-01"></div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="checkbox">
+        <div class="fv-tag">type="checkbox"</div>
+        <div class="fv-preview"><input type="checkbox" checked> <label>Aceito os termos</label></div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="radio">
+        <div class="fv-tag">type="radio"</div>
+        <div class="fv-preview">
+          <input type="radio" name="op" checked> <label>HTML</label>
+          &nbsp;&nbsp;<input type="radio" name="op"> <label>CSS</label>
+          &nbsp;&nbsp;<input type="radio" name="op"> <label>JS</label>
+        </div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="select">
+        <div class="fv-tag">&lt;select&gt;</div>
+        <div class="fv-preview">
+          <label>Curso:</label>
+          <select><option>Desenvolvimento Web</option><option>Design</option><option>Marketing</option></select>
+        </div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="textarea">
+        <div class="fv-tag">&lt;textarea&gt;</div>
+        <div class="fv-preview">
+          <label>Mensagem:</label><br>
+          <textarea>Escreva sua mensagem...</textarea>
+        </div>
+        <div class="fv-use">→ usar</div>
+      </div>
+      <div class="fv-row" data-input="button">
+        <div class="fv-tag">&lt;button&gt;</div>
+        <div class="fv-preview"><button type="button">Enviar Formulário</button></div>
+        <div class="fv-use">→ usar</div>
+      </div>
+    </div>
+
+    <!-- TAG REFERENCE -->
+    <div class="sec-title">▸ atributos importantes</div>
+    <div class="sec-h2">Clique em um card para carregar no playground</div>
+
+    <div class="tags-grid">
+      <div class="tag-card" data-tag="placeholder">
+        <div class="tag-code" style="color:#f87171">placeholder=""</div>
+        <div class="preview" style="font-size:.8rem">Dica dentro do campo antes de digitar.</div>
+        <p>Texto de exemplo que aparece quando o campo está vazio. Desaparece ao digitar.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="required">
+        <div class="tag-code" style="color:#fbbf24">required</div>
+        <div class="preview" style="font-size:.8rem">Campo obrigatório — bloqueia envio.</div>
+        <p>Impede o envio se o campo estiver vazio. O navegador exibe mensagem de erro.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="disabled">
+        <div class="tag-code" style="color:#94a3b8">disabled</div>
+        <div class="preview" style="font-size:.8rem">Campo desabilitado (cinza).</div>
+        <p>Desativa o campo. O usuário não consegue clicar nem digitar.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="value">
+        <div class="tag-code" style="color:#34d399">value=""</div>
+        <div class="preview" style="font-size:.8rem">Valor padrão já preenchido.</div>
+        <p>Define o valor inicial do campo quando a página carrega.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="name">
+        <div class="tag-code" style="color:#60a5fa">name=""</div>
+        <div class="preview" style="font-size:.8rem">Identifica o campo no envio.</div>
+        <p>Nome do campo que é enviado junto com o valor para o servidor. Essencial!</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="label">
+        <div class="tag-code" style="color:#a78bfa">&lt;label for=""&gt;</div>
+        <div class="preview" style="font-size:.8rem">Rótulo associado ao campo.</div>
+        <p>Conecta o texto ao campo pelo atributo <code>for</code>. Clicando no label foca o input.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+    </div>
+
+    <div class="warn-box">
+      <strong>⚠️ Atenção:</strong> O atributo <code style="color:var(--amber)">name</code> é obrigatório para que o valor do campo seja enviado com o formulário. Campos sem <code>name</code> são ignorados no envio!
+    </div>
+
+    <!-- PLAYGROUND -->
+    <div class="sec-title">▸ playground interativo</div>
+    <div class="sec-h2">Edite e veja o resultado em tempo real</div>
+
+    <div class="playground">
+      <div class="playground-header">
+        <div class="pg-title"><span>⚡</span><span>Editor ao vivo</span></div>
+        <button class="run-btn" type="button" id="runPlayground">▶ Executar</button>
+      </div>
+      <div class="playground-body">
+        <div class="pg-editor">
+          <div class="pg-editor-tabs">
+            <button class="pg-tab active">HTML</button>
+          </div>
+          <textarea class="pg-textarea" id="htmlEditor" spellcheck="false"><form>
+  <label for="nome">Nome:</label>
+  <input type="text" id="nome" name="nome"
+         placeholder="Digite seu nome">
+
+  <br><br>
+
+  <label for="email">E-mail:</label>
+  <input type="email" id="email" name="email"
+         placeholder="seu@email.com" required>
+
+  <br><br>
+
+  <label for="curso">Curso:</label>
+  <select id="curso" name="curso">
+    <option>Desenvolvimento Web</option>
+    <option>Design</option>
+    <option>Marketing</option>
+  </select>
+
+  <br><br>
+
+  <button type="submit">Enviar</button>
+</form></textarea>
+        </div>
+        <div class="pg-result">
+          <div class="pg-result-label">⬛ Resultado</div>
+          <iframe class="pg-iframe" id="preview"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXAMPLES -->
+    <div class="sec-title">▸ exemplos completos — clique para usar</div>
+    <div class="sec-h2">Copie e experimente no Playground</div>
+
+    <div class="examples-grid">
+
+      <div class="ex-card" data-example="0">
+        <div class="ex-card-head">
+          <h3>🔐 Login simples</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;form&gt;
+  &lt;h2&gt;Login&lt;/h2&gt;
+  &lt;label for="u"&gt;Usuário:&lt;/label&gt;
+  &lt;input type="text" id="u"
+         name="usuario"
+         placeholder="seu usuário"
+         required&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;label for="s"&gt;Senha:&lt;/label&gt;
+  &lt;input type="password" id="s"
+         name="senha" required&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;button type="submit"&gt;Entrar&lt;/button&gt;
+&lt;/form&gt;</div>
+        <div class="ex-desc">Formulário de login com usuário e senha.</div>
+      </div>
+
+      <div class="ex-card" data-example="1">
+        <div class="ex-card-head">
+          <h3>📝 Cadastro básico</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;form&gt;
+  &lt;h2&gt;Cadastro&lt;/h2&gt;
+  &lt;label&gt;Nome:&lt;/label&gt;
+  &lt;input type="text" name="nome"&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;label&gt;E-mail:&lt;/label&gt;
+  &lt;input type="email" name="email"&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;label&gt;Nascimento:&lt;/label&gt;
+  &lt;input type="date" name="nasc"&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;button type="submit"&gt;
+    Cadastrar
+  &lt;/button&gt;
+&lt;/form&gt;</div>
+        <div class="ex-desc">Cadastro com nome, e-mail e data de nascimento.</div>
+      </div>
+
+      <div class="ex-card" data-example="2">
+        <div class="ex-card-head">
+          <h3>📋 Com select e radio</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;form&gt;
+  &lt;label&gt;Turno:&lt;/label&gt;&lt;br&gt;
+  &lt;input type="radio"
+    name="turno" value="M"&gt; Manhã
+  &lt;input type="radio"
+    name="turno" value="T"&gt; Tarde
+  &lt;input type="radio"
+    name="turno" value="N"&gt; Noite
+  &lt;br&gt;&lt;br&gt;
+  &lt;label&gt;Curso:&lt;/label&gt;
+  &lt;select name="curso"&gt;
+    &lt;option&gt;HTML&lt;/option&gt;
+    &lt;option&gt;CSS&lt;/option&gt;
+    &lt;option&gt;JavaScript&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;button&gt;Confirmar&lt;/button&gt;
+&lt;/form&gt;</div>
+        <div class="ex-desc">Radio buttons e select para escolhas múltiplas.</div>
+      </div>
+
+      <div class="ex-card" data-example="3">
+        <div class="ex-card-head">
+          <h3>✉️ Formulário de contato</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;form&gt;
+  &lt;h2&gt;Fale Conosco&lt;/h2&gt;
+  &lt;label&gt;Nome:&lt;/label&gt;
+  &lt;input type="text" name="nome"
+    placeholder="Seu nome" required&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;label&gt;Assunto:&lt;/label&gt;
+  &lt;input type="text" name="assunto"
+    placeholder="Motivo do contato"&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;label&gt;Mensagem:&lt;/label&gt;&lt;br&gt;
+  &lt;textarea name="msg" rows="4"
+    placeholder="Escreva aqui..."
+  &gt;&lt;/textarea&gt;
+  &lt;br&gt;&lt;br&gt;
+  &lt;input type="checkbox"
+    name="aceito" required&gt;
+  Aceito os termos
+  &lt;br&gt;&lt;br&gt;
+  &lt;button type="submit"&gt;
+    Enviar Mensagem
+  &lt;/button&gt;
+&lt;/form&gt;</div>
+        <div class="ex-desc">Formulário completo com textarea e checkbox.</div>
+      </div>
+
+    </div>
+
+    <!-- QUIZ -->
+    <div class="sec-title">▸ teste seus conhecimentos</div>
+    <div class="sec-h2">Mini Quiz — 4 perguntas rápidas</div>
+
+    <div class="quiz-section">
+      <h3>🧠 Responda sem olhar o código!</h3>
+
+      <div class="quiz-item">
+        <p>1. Qual tag envolve todos os campos de um formulário?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">&lt;input&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="true">&lt;form&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;fieldset&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;div&gt;</button>
+        </div>
+        <div class="quiz-feedback" id="qf0"></div>
+      </div>
+
+      <div class="quiz-item">
+        <p>2. Qual type deixa o texto digitado como ••••••?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">type="secret"</button>
+          <button class="quiz-opt" type="button" data-correct="false">type="hidden"</button>
+          <button class="quiz-opt" type="button" data-correct="true">type="password"</button>
+          <button class="quiz-opt" type="button" data-correct="false">type="private"</button>
+        </div>
+        <div class="quiz-feedback" id="qf1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <p>3. Qual atributo impede o envio se o campo estiver vazio?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">disabled</button>
+          <button class="quiz-opt" type="button" data-correct="false">readonly</button>
+          <button class="quiz-opt" type="button" data-correct="true">required</button>
+          <button class="quiz-opt" type="button" data-correct="false">nosubmit</button>
+        </div>
+        <div class="quiz-feedback" id="qf2"></div>
+      </div>
+
+      <div class="quiz-item">
+        <p>4. Para criar uma lista de opções com menu suspenso, usamos:</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">&lt;input type="list"&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="true">&lt;select&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;options&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;dropdown&gt;</button>
+        </div>
+        <div class="quiz-feedback" id="qf3"></div>
+      </div>
+    </div>
+
+    <!-- EXERCISE -->
+    <div class="exercise-section">
+      <div class="exercise-badge">✏️ EXERCÍCIO 03</div>
+      <h2>Crie um formulário de cadastro de aluno!</h2>
+      <p>Use o playground acima para montar um formulário completo. Use pelo menos 5 tipos de elementos diferentes desta aula.</p>
+
+      <ul class="task-list">
+        <li>
+          <span class="task-num">1</span>
+          <div>
+            <strong>Cabeçalho do formulário</strong> — Use <code style="color:var(--cyan)">&lt;h2&gt;</code> com o título "Cadastro de Aluno".
+          </div>
+        </li>
+        <li>
+          <span class="task-num">2</span>
+          <div>
+            <strong>Campo de nome</strong> — <code style="color:var(--cyan)">&lt;label&gt;</code> + <code style="color:var(--cyan)">&lt;input type="text"&gt;</code> com <code style="color:var(--cyan)">placeholder</code> e <code style="color:var(--cyan)">required</code>.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">3</span>
+          <div>
+            <strong>Campo de e-mail</strong> — Use <code style="color:var(--cyan)">type="email"</code> para validação automática.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">4</span>
+          <div>
+            <strong>Seleção de turno</strong> — Use <code style="color:var(--cyan)">type="radio"</code> com opções Manhã, Tarde e Noite (mesmo <code style="color:var(--cyan)">name</code> nos três!).
+          </div>
+        </li>
+        <li>
+          <span class="task-num">5</span>
+          <div>
+            <strong>Escolha de curso</strong> — Use <code style="color:var(--cyan)">&lt;select&gt;</code> com pelo menos 3 <code style="color:var(--cyan)">&lt;option&gt;</code>.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">6</span>
+          <div>
+            <strong>Checkbox de termos</strong> — <code style="color:var(--cyan)">type="checkbox"</code> com label "Li e aceito os termos".
+          </div>
+        </li>
+        <li>
+          <span class="task-num">7</span>
+          <div>
+            <strong>Botão de envio</strong> — <code style="color:var(--cyan)">&lt;button type="submit"&gt;</code> com o texto "Realizar Cadastro".
+          </div>
+        </li>
+      </ul>
+
+      <button class="answer-toggle" type="button">
+        💡 Ver exemplo de resposta
+      </button>
+      <div class="answer-body" id="answerBody">
+        <pre>&lt;form&gt;
+  &lt;h2&gt;Cadastro de Aluno&lt;/h2&gt;
+
+  &lt;label for="nome"&gt;Nome completo:&lt;/label&gt;&lt;br&gt;
+  &lt;input type="text" id="nome" name="nome"
+         placeholder="Digite seu nome completo" required&gt;
+  &lt;br&gt;&lt;br&gt;
+
+  &lt;label for="email"&gt;E-mail:&lt;/label&gt;&lt;br&gt;
+  &lt;input type="email" id="email" name="email"
+         placeholder="seu@email.com" required&gt;
+  &lt;br&gt;&lt;br&gt;
+
+  &lt;label&gt;Turno:&lt;/label&gt;&lt;br&gt;
+  &lt;input type="radio" name="turno" value="M"&gt; Manhã
+  &lt;input type="radio" name="turno" value="T"&gt; Tarde
+  &lt;input type="radio" name="turno" value="N"&gt; Noite
+  &lt;br&gt;&lt;br&gt;
+
+  &lt;label for="curso"&gt;Curso:&lt;/label&gt;&lt;br&gt;
+  &lt;select id="curso" name="curso"&gt;
+    &lt;option&gt;Desenvolvimento Web&lt;/option&gt;
+    &lt;option&gt;Design Gráfico&lt;/option&gt;
+    &lt;option&gt;Redes de Computadores&lt;/option&gt;
+  &lt;/select&gt;
+  &lt;br&gt;&lt;br&gt;
+
+  &lt;input type="checkbox" name="termos" required&gt;
+  Li e aceito os termos
+  &lt;br&gt;&lt;br&gt;
+
+  &lt;button type="submit"&gt;Realizar Cadastro&lt;/button&gt;
+&lt;/form&gt;</pre>
+      </div>
+    </div>
+
+    <!-- FOOTER NAV -->
+    <div class="footer-nav">
+      <a href="titulos-e-textos.html" class="nav-btn nav-prev">← Aula anterior: Títulos e Textos</a>
+      <a href="css-interativo-iff.html" class="nav-btn nav-next">Próxima aula: CSS →</a>
+    </div>
+
+  </div>
+
+  <script>
+    // ── EXAMPLES ──
+    const examples = [
+      `<form>\n  <h2>Login</h2>\n  <label for="u">Usuário:</label>\n  <input type="text" id="u" name="usuario" placeholder="seu usuário" required>\n  <br><br>\n  <label for="s">Senha:</label>\n  <input type="password" id="s" name="senha" required>\n  <br><br>\n  <button type="submit">Entrar</button>\n</form>`,
+      `<form>\n  <h2>Cadastro</h2>\n  <label>Nome:</label>\n  <input type="text" name="nome"><br><br>\n  <label>E-mail:</label>\n  <input type="email" name="email"><br><br>\n  <label>Nascimento:</label>\n  <input type="date" name="nasc"><br><br>\n  <button type="submit">Cadastrar</button>\n</form>`,
+      `<form>\n  <label>Turno:</label><br>\n  <input type="radio" name="turno" value="M"> Manhã\n  <input type="radio" name="turno" value="T"> Tarde\n  <input type="radio" name="turno" value="N"> Noite\n  <br><br>\n  <label>Curso:</label>\n  <select name="curso">\n    <option>HTML</option>\n    <option>CSS</option>\n    <option>JavaScript</option>\n  </select>\n  <br><br>\n  <button>Confirmar</button>\n</form>`,
+      `<form>\n  <h2>Fale Conosco</h2>\n  <label>Nome:</label>\n  <input type="text" name="nome" placeholder="Seu nome" required>\n  <br><br>\n  <label>Assunto:</label>\n  <input type="text" name="assunto" placeholder="Motivo do contato">\n  <br><br>\n  <label>Mensagem:</label><br>\n  <textarea name="msg" rows="4" placeholder="Escreva aqui..."></textarea>\n  <br><br>\n  <input type="checkbox" name="aceito" required> Aceito os termos\n  <br><br>\n  <button type="submit">Enviar Mensagem</button>\n</form>`
+    ];
+
+    const tagExamples = {
+      placeholder: `<form>\n  <label>Nome:</label>\n  <input type="text" name="nome"\n         placeholder="Ex: João Silva">\n  <br><br>\n  <label>E-mail:</label>\n  <input type="email" name="email"\n         placeholder="Ex: joao@email.com">\n  <br><br>\n  <button>Enviar</button>\n</form>`,
+      required:    `<form>\n  <label>Nome (obrigatório):</label>\n  <input type="text" name="nome" required>\n  <br><br>\n  <label>E-mail (obrigatório):</label>\n  <input type="email" name="email" required>\n  <br><br>\n  <p>Tente clicar em Enviar com campos vazios!</p>\n  <button type="submit">Enviar</button>\n</form>`,
+      disabled:    `<form>\n  <label>Campo ativo:</label>\n  <input type="text" name="ativo" value="Pode editar">\n  <br><br>\n  <label>Campo desabilitado:</label>\n  <input type="text" name="inativo"\n         value="Não pode editar" disabled>\n  <br><br>\n  <button>Enviar</button>\n</form>`,
+      value:       `<form>\n  <label>Nome:</label>\n  <input type="text" name="nome"\n         value="João Silva">\n  <br><br>\n  <label>Cidade:</label>\n  <input type="text" name="cidade"\n         value="Itaperuna">\n  <br><br>\n  <button>Confirmar</button>\n</form>`,
+      name:        `<form>\n  <!-- Sem name: dado NÃO é enviado -->\n  <label>Sem name:</label>\n  <input type="text" placeholder="Não será enviado">\n  <br><br>\n  <!-- Com name: dado É enviado -->\n  <label>Com name="usuario":</label>\n  <input type="text" name="usuario"\n         placeholder="Será enviado">\n  <br><br>\n  <button>Enviar</button>\n</form>`,
+      label:       `<form>\n  <!-- Clique no texto do label: foca o input! -->\n  <label for="nome">Clique aqui para focar:</label>\n  <input type="text" id="nome" name="nome"\n         placeholder="Foco veio do label!">\n  <br><br>\n  <label for="email">E-mail:</label>\n  <input type="email" id="email" name="email">\n  <br><br>\n  <button>Enviar</button>\n</form>`
+    };
+
+    const inputExamples = {
+      text:     `<form>\n  <label for="nome">Nome:</label>\n  <input type="text" id="nome" name="nome"\n         placeholder="Digite seu nome">\n  <br><br>\n  <button>Enviar</button>\n</form>`,
+      email:    `<form>\n  <label for="email">E-mail:</label>\n  <input type="email" id="email" name="email"\n         placeholder="seu@email.com" required>\n  <br><br>\n  <button type="submit">Enviar</button>\n</form>`,
+      password: `<form>\n  <label for="senha">Senha:</label>\n  <input type="password" id="senha" name="senha"\n         placeholder="Mínimo 8 caracteres">\n  <br><br>\n  <button>Entrar</button>\n</form>`,
+      number:   `<form>\n  <label for="idade">Idade:</label>\n  <input type="number" id="idade" name="idade"\n         min="1" max="120" value="18">\n  <br><br>\n  <label for="nota">Nota (0-10):</label>\n  <input type="number" id="nota" name="nota"\n         min="0" max="10" step="0.5">\n  <br><br>\n  <button>Salvar</button>\n</form>`,
+      date:     `<form>\n  <label for="nasc">Data de nascimento:</label>\n  <input type="date" id="nasc" name="nascimento">\n  <br><br>\n  <label for="entrega">Data de entrega:</label>\n  <input type="date" id="entrega" name="entrega">\n  <br><br>\n  <button>Confirmar</button>\n</form>`,
+      checkbox: `<form>\n  <p>Quais linguagens você conhece?</p>\n  <input type="checkbox" name="lang" value="html"> HTML<br>\n  <input type="checkbox" name="lang" value="css" checked> CSS<br>\n  <input type="checkbox" name="lang" value="js"> JavaScript<br>\n  <br>\n  <button type="submit">Salvar</button>\n</form>`,
+      radio:    `<form>\n  <p>Qual seu turno?</p>\n  <input type="radio" name="turno" value="M"> Manhã<br>\n  <input type="radio" name="turno" value="T"> Tarde<br>\n  <input type="radio" name="turno" value="N"> Noite<br>\n  <br>\n  <button type="submit">Confirmar</button>\n</form>`,
+      select:   `<form>\n  <label for="curso">Curso:</label><br>\n  <select id="curso" name="curso">\n    <option value="">-- Selecione --</option>\n    <option value="web">Desenvolvimento Web</option>\n    <option value="design">Design Gráfico</option>\n    <option value="dados">Ciência de Dados</option>\n  </select>\n  <br><br>\n  <button>Confirmar</button>\n</form>`,
+      textarea: `<form>\n  <label for="msg">Mensagem:</label><br>\n  <textarea id="msg" name="mensagem"\n            rows="5" cols="40"\n            placeholder="Escreva sua mensagem aqui..."></textarea>\n  <br><br>\n  <button type="submit">Enviar</button>\n</form>`,
+      button:   `<form>\n  <label>Nome:</label>\n  <input type="text" name="nome">\n  <br><br>\n  <!-- Envia o formulário -->\n  <button type="submit">Enviar</button>\n\n  <!-- Limpa todos os campos -->\n  <button type="reset">Limpar</button>\n\n  <!-- Só executa JS, não envia -->\n  <button type="button">Clique Aqui</button>\n</form>`
+    };
+
+    function loadExample(i) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || examples[i] === undefined) return;
+      ed.value = examples[i];
+      document.querySelectorAll('.ex-card').forEach(function (c, j) { c.classList.toggle('active', i === j); });
+      runCode();
+      var pv = document.getElementById('preview');
+      if (pv) pv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function loadTag(tag) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || !tagExamples[tag]) return;
+      ed.value = tagExamples[tag];
+      runCode();
+      document.getElementById('preview').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function loadInput(type) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || !inputExamples[type]) return;
+      ed.value = inputExamples[type];
+      runCode();
+      document.getElementById('preview').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ── PLAYGROUND ──
+    function runCode() {
+      const editor = document.getElementById('htmlEditor');
+      const iframe = document.getElementById('preview');
+      if (!editor || !iframe) return;
+      const html = editor.value;
+      iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>body{font-family:Arial,sans-serif;padding:20px;line-height:1.8;color:#1e293b;}h2{color:#1e293b;margin-bottom:12px;}label{display:inline-block;margin-bottom:2px;font-weight:600;}input[type=text],input[type=email],input[type=password],input[type=number],input[type=date],select,textarea{padding:7px 10px;border:1px solid #cbd5e1;border-radius:6px;font-size:14px;font-family:Arial;width:auto;}textarea{width:100%;max-width:320px;}button{padding:8px 20px;background:#3b82f6;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;margin-right:8px;}button[type=reset]{background:#64748b;}button[type=button]{background:#a78bfa;}</style></head><body>${html}</body></html>`;
+    }
+
+    // ── DEMO INTERATIVO ──
+    function updateDemo() {
+      const labelInput = document.getElementById('demoLabel');
+      const typeSelect = document.getElementById('demoType');
+      const placeholderInput = document.getElementById('demoPlaceholder');
+      const out = document.getElementById('demoOutput');
+      if (!labelInput || !typeSelect || !out) return;
+
+      const labelText = labelInput.value || 'Campo';
+      const type = typeSelect.value;
+      const placeholder = placeholderInput ? placeholderInput.value : '';
+
+      while (out.firstChild) out.removeChild(out.firstChild);
+
+      const wrapper = document.createElement('div');
+      wrapper.style.fontFamily = 'Arial, sans-serif';
+      wrapper.style.color = '#1e293b';
+
+      const lbl = document.createElement('label');
+      lbl.textContent = labelText + ':';
+      lbl.style.fontWeight = '600';
+      lbl.style.display = 'block';
+      lbl.style.marginBottom = '6px';
+
+      if (type === 'checkbox' || type === 'radio') {
+        const inp = document.createElement('input');
+        inp.type = type;
+        const span = document.createElement('span');
+        span.textContent = ' ' + labelText;
+        span.style.marginLeft = '4px';
+        wrapper.appendChild(inp);
+        wrapper.appendChild(span);
+      } else {
+        const inp = document.createElement('input');
+        inp.type = type;
+        inp.placeholder = placeholder;
+        inp.style.padding = '7px 10px';
+        inp.style.border = '1px solid #cbd5e1';
+        inp.style.borderRadius = '6px';
+        inp.style.fontSize = '14px';
+        inp.style.width = '260px';
+        wrapper.appendChild(lbl);
+        wrapper.appendChild(inp);
+      }
+
+      out.appendChild(wrapper);
+    }
+
+    // ── QUIZ ──
+    function checkQuiz(btn, correct) {
+      if (!btn || !btn.closest) return;
+      const parent = btn.closest('.quiz-item');
+      if (!parent) return;
+      parent.querySelectorAll('.quiz-opt').forEach(function (o) { o.style.pointerEvents = 'none'; });
+      btn.classList.add(correct ? 'correct' : 'wrong');
+      const fb = parent.querySelector('.quiz-feedback');
+      if (fb) {
+        fb.textContent = correct ? '✅ Correto! Muito bem!' : '❌ Não é essa. Revise os conceitos acima!';
+        fb.className = 'quiz-feedback ' + (correct ? 'ok' : 'err');
+      }
+    }
+
+    // ── INIT ──
+    function init() {
+      const wrap = document.querySelector('.wrap');
+      if (!wrap) return;
+
+      wrap.addEventListener('click', function (e) {
+        var t = e.target;
+        if (t && t.nodeType !== 1) t = t.parentElement;
+        if (!t || typeof t.closest !== 'function') return;
+
+        if (t.closest('#runPlayground')) { e.preventDefault(); runCode(); return; }
+
+        var quizOpt = t.closest('.quiz-opt');
+        if (quizOpt) { e.preventDefault(); checkQuiz(quizOpt, quizOpt.getAttribute('data-correct') === 'true'); return; }
+
+        var ansBtn = t.closest('.answer-toggle');
+        if (ansBtn) {
+          e.preventDefault();
+          var body = document.getElementById('answerBody');
+          if (body) body.classList.toggle('open');
+          return;
+        }
+
+        var useBtn = t.closest('.use-btn');
+        if (useBtn) {
+          e.preventDefault();
+          var exCard = useBtn.closest('.ex-card[data-example]');
+          if (exCard) { var i = parseInt(exCard.getAttribute('data-example'), 10); if (!isNaN(i)) loadExample(i); }
+          return;
+        }
+
+        var fvRow = t.closest('.fv-row[data-input]');
+        if (fvRow) { loadInput(fvRow.getAttribute('data-input')); return; }
+
+        var tagCard = t.closest('.tag-card[data-tag]');
+        if (tagCard) { loadTag(tagCard.getAttribute('data-tag')); return; }
+
+        var exCard2 = t.closest('.ex-card[data-example]');
+        if (exCard2) { var j = parseInt(exCard2.getAttribute('data-example'), 10); if (!isNaN(j)) loadExample(j); }
+      });
+
+      ['demoLabel', 'demoType', 'demoPlaceholder'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('input', updateDemo);
+      });
+
+      var htmlEditor = document.getElementById('htmlEditor');
+      var timer;
+      if (htmlEditor) {
+        htmlEditor.addEventListener('input', function () {
+          clearTimeout(timer);
+          timer = setTimeout(runCode, 500);
+        });
+      }
+
+      updateDemo();
+      runCode();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+
+</body>
+</html>

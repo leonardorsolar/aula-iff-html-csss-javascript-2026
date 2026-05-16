@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 01 — Títulos e Textos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0f172a;
+      --dark:   #1e293b;
+      --panel:  #1a2744;
+      --blue:   #3b82f6;
+      --cyan:   #06b6d4;
+      --amber:  #f59e0b;
+      --green:  #10b981;
+      --red:    #ef4444;
+      --purple: #a78bfa;
+      --white:  #f8fafc;
+      --muted:  #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(139,92,246,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(139,92,246,.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .back-btn {
+      text-decoration: none; color: var(--muted); font-size: 13px;
+      display: flex; align-items: center; gap: 6px; transition: color .2s;
+    }
+    .back-btn:hover { color: var(--white); }
+    .topbar-pill {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      background: rgba(167,139,250,.15); color: var(--purple);
+      border: 1px solid rgba(167,139,250,.3); border-radius: 100px;
+      padding: 4px 12px; letter-spacing: 1px;
+    }
+    .topbar-right { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+
+    /* ── LAYOUT ── */
+    .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    .page-header { padding: 48px 0 40px; }
+    .lesson-tag {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--purple);
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .page-header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 12px; }
+    .page-header p  { font-size: 1rem; color: var(--muted); line-height: 1.7; max-width: 640px; }
+
+    /* ── HEADING VISUALIZER ── */
+    .sec-title {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--cyan);
+      text-transform: uppercase; margin-bottom: 12px; margin-top: 48px;
+    }
+    .sec-h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; color: var(--white); }
+
+    .headings-visual {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; margin-bottom: 36px;
+    }
+
+    .hv-header {
+      background: #0d1b2e; padding: 12px 20px;
+      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hv-row {
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--border); cursor: pointer;
+      transition: background .15s;
+    }
+    .hv-row:last-child { border-bottom: none; }
+    .hv-row:hover { background: rgba(167,139,250,.06); }
+
+    .hv-tag {
+      width: 110px; flex-shrink: 0;
+      padding: 14px 18px;
+      font-family: 'Space Mono', monospace; font-weight: 700;
+      color: var(--purple); font-size: 12px;
+      border-right: 1px solid var(--border);
+    }
+
+    .hv-preview { padding: 14px 20px; flex: 1; color: var(--white); }
+    .hv-preview.h1 { font-size: 1.8rem; font-weight: 800; }
+    .hv-preview.h2 { font-size: 1.4rem; font-weight: 700; }
+    .hv-preview.h3 { font-size: 1.15rem; font-weight: 700; }
+    .hv-preview.h4 { font-size: 1rem; font-weight: 600; }
+    .hv-preview.h5 { font-size: .9rem; font-weight: 600; color: var(--muted); }
+    .hv-preview.h6 { font-size: .8rem; font-weight: 600; color: #64748b; }
+
+    .hv-use {
+      padding: 0 18px; flex-shrink: 0;
+      font-family: 'Space Mono', monospace; font-size: 10px;
+      color: var(--purple); opacity: 0; transition: opacity .15s;
+    }
+    .hv-row:hover .hv-use { opacity: 1; }
+
+    /* ── TAG REFERENCE ── */
+    .tags-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin-bottom: 48px;
+    }
+
+    .tag-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .tag-card:hover { border-color: var(--purple); transform: translateY(-2px); }
+
+    .tag-code {
+      font-family: 'Space Mono', monospace; font-size: 14px;
+      font-weight: 700; margin-bottom: 8px;
+    }
+    .tag-card .preview { margin-bottom: 10px; font-size: .9rem; }
+    .tag-card p { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+
+    .load-tag-btn {
+      display: inline-block; margin-top: 10px;
+      font-size: 10px; padding: 3px 10px; border-radius: 100px;
+      background: var(--purple); color: var(--navy);
+      border: none; cursor: pointer; font-weight: 700;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* ── EXAMPLES GRID ── */
+    .examples-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 48px;
+    }
+    .ex-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .ex-card:hover { border-color: var(--purple); transform: translateY(-3px); }
+    .ex-card.active { border-color: var(--purple); box-shadow: 0 0 0 2px rgba(167,139,250,.2); }
+
+    .ex-card-head {
+      padding: 16px 18px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ex-card-head h3 { font-size: .95rem; font-weight: 700; }
+    .use-btn {
+      font-size: 11px; padding: 4px 12px; border-radius: 100px;
+      background: var(--purple); color: var(--navy);
+      border: none; cursor: pointer; font-weight: 700;
+      font-family: 'Space Mono', monospace; transition: opacity .2s;
+    }
+    .use-btn:hover { opacity: .85; }
+    .ex-code {
+      background: #0d1b2e; padding: 14px 18px;
+      font-family: 'Space Mono', monospace; font-size: 11.5px; line-height: 1.7;
+      color: #7dd3fc; white-space: pre; overflow-x: auto;
+    }
+    .ex-desc { padding: 12px 18px 16px; font-size: .8rem; color: var(--muted); }
+
+    /* ── PLAYGROUND ── */
+    .playground {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; margin-bottom: 56px;
+    }
+    .playground-header {
+      background: #0d1b2e; padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .pg-title { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+    .run-btn {
+      background: var(--green); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 8px 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: background .2s; font-family: 'Sora', sans-serif;
+    }
+    .run-btn:hover { background: #059669; }
+
+    .playground-body {
+      display: grid; grid-template-columns: 1fr 1fr; min-height: 420px;
+    }
+    @media(max-width: 700px) { .playground-body { grid-template-columns: 1fr; } }
+
+    .pg-editor { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    .pg-editor-tabs {
+      display: flex; border-bottom: 1px solid var(--border); background: #0d1b2e;
+    }
+    .pg-tab {
+      padding: 10px 18px; font-family: 'Space Mono', monospace; font-size: 11px;
+      color: var(--muted); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+    }
+    .pg-tab.active { color: var(--purple); border-bottom-color: var(--purple); }
+    .pg-textarea {
+      flex: 1; background: #0d1b2e; border: none; outline: none;
+      color: #7dd3fc; font-family: 'Space Mono', monospace;
+      font-size: 12.5px; line-height: 1.8;
+      padding: 20px; resize: none; width: 100%; min-height: 380px;
+    }
+    .pg-result { display: flex; flex-direction: column; }
+    .pg-result-label {
+      padding: 10px 18px;
+      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: var(--dark);
+    }
+    .pg-iframe { flex: 1; border: none; background: #fff; min-height: 380px; width: 100%; }
+
+    /* ── INTERACTIVE DEMO ── */
+    .demo-section {
+      background: var(--dark); border: 1px solid rgba(167,139,250,.25);
+      border-radius: 16px; padding: 28px; margin-bottom: 48px;
+    }
+    .demo-section h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; }
+
+    .demo-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 24px; }
+
+    .demo-input {
+      background: #0d1b2e; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; color: var(--white); font-family: 'Sora', sans-serif;
+      font-size: .9rem; flex: 1; min-width: 200px; outline: none;
+      transition: border-color .2s;
+    }
+    .demo-input:focus { border-color: var(--purple); }
+
+    .demo-select {
+      background: #0d1b2e; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; color: var(--white); font-family: 'Space Mono', monospace;
+      font-size: .85rem; outline: none; cursor: pointer;
+    }
+
+    .demo-preview-box {
+      background: #fff; border-radius: 10px; padding: 24px 28px;
+      min-height: 80px; display: flex; align-items: center;
+    }
+
+    /* ── EXERCISE ── */
+    .exercise-section {
+      background: #180e28; border: 1px solid rgba(167,139,250,.25);
+      border-radius: 16px; padding: 32px; margin-bottom: 56px;
+    }
+    .exercise-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(167,139,250,.15); color: var(--purple);
+      border: 1px solid rgba(167,139,250,.3);
+      border-radius: 100px; padding: 6px 16px;
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      font-weight: 700; letter-spacing: 1px; margin-bottom: 18px;
+    }
+    .exercise-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+    .exercise-section > p { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 24px; }
+
+    .task-list { list-style: none; margin-bottom: 28px; }
+    .task-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(167,139,250,.1);
+      font-size: .9rem;
+    }
+    .task-list li:last-child { border-bottom: none; }
+    .task-num {
+      flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(167,139,250,.2); color: var(--purple);
+      font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .answer-toggle {
+      background: rgba(167,139,250,.1); border: 1px solid rgba(167,139,250,.25);
+      border-radius: 10px; padding: 14px 18px; cursor: pointer;
+      font-size: .9rem; color: var(--purple); font-weight: 600;
+      width: 100%; text-align: left; display: flex; align-items: center; gap: 8px;
+    }
+    .answer-body {
+      background: #0d1b2e; border: 1px solid rgba(167,139,250,.15);
+      border-top: none; border-radius: 0 0 10px 10px;
+      padding: 18px; display: none;
+    }
+    .answer-body.open { display: block; }
+    .answer-body pre { font-family: 'Space Mono', monospace; font-size: 12px; color: #7dd3fc; line-height: 1.7; }
+
+    /* ── QUIZ ── */
+    .quiz-section {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; margin-bottom: 48px;
+    }
+    .quiz-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+
+    .quiz-item { margin-bottom: 24px; }
+    .quiz-item p { font-size: .9rem; font-weight: 600; margin-bottom: 12px; }
+
+    .quiz-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quiz-opt {
+      padding: 8px 18px; border-radius: 8px;
+      background: #0d1b2e; border: 1px solid var(--border);
+      cursor: pointer; font-size: .85rem; color: var(--white);
+      transition: border-color .2s, background .2s;
+      font-family: 'Space Mono', monospace;
+    }
+    .quiz-opt:hover { border-color: var(--purple); }
+    .quiz-opt.correct { background: rgba(16,185,129,.2); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong   { background: rgba(239,68,68,.15); border-color: var(--red); color: var(--red); }
+
+    .quiz-feedback { font-size: .8rem; margin-top: 8px; min-height: 18px; }
+    .quiz-feedback.ok  { color: var(--green); }
+    .quiz-feedback.err { color: var(--red); }
+
+    /* ── FOOTER NAV ── */
+    .footer-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 32px 0 48px; border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: 16px;
+    }
+    .nav-btn {
+      text-decoration: none; padding: 12px 24px;
+      border-radius: 10px; font-size: .9rem; font-weight: 600;
+      display: flex; align-items: center; gap: 8px; transition: transform .2s;
+    }
+    .nav-btn:hover { transform: translateY(-2px); }
+    .nav-prev { background: var(--dark); border: 1px solid var(--border); color: var(--muted); }
+    .nav-next { background: var(--blue); color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn">← Voltar</a>
+      <span class="topbar-pill">AULA 01</span>
+    </div>
+    <div class="topbar-right">titulos-e-textos.html</div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="lesson-tag">▸ Aula 01 de 04</div>
+      <h1>📝 Títulos e Textos</h1>
+      <p>Aprenda a organizar conteúdo com as 6 tags de título, parágrafos e formatação de texto. São as ferramentas mais usadas do HTML.</p>
+    </div>
+
+    <!-- ESTRUTURA HTML VISUAL -->
+    <div class="sec-title">▸ entenda a estrutura de uma tag</div>
+
+    <div class="sec-h2">O que é uma Tag HTML?</div>
+    <p>Tags são marcadores ou etiquetas usados para identificar, organizar ou estruturar informações.</p><br>
+
+    <div class="sec-h2">Anatomia de um elemento HTML</div>
+
+    <div class="demo-section" style="background: #0d1b2e; border: 1px solid rgba(167,139,250,.25);">
+      <div style="display: flex; gap: 40px; align-items: flex-start; justify-content: center; flex-wrap: wrap;">
+        <!-- Tag de abertura -->
+        <div style="text-align: center;">
+          <div style="padding: 16px 24px; border-radius: 6px; background: #1f3b5c; font-size: 22px; min-width: 220px; color: #6bffb0; font-weight: bold;">&lt;h1&gt;</div>
+          <div style="height: 20px; width: 2px; background: #6bffb0; margin: 8px auto;"></div>
+          <div style="margin-top: 12px; font-size: 14px; opacity: 0.85; color: #6bffb0;">Tag de abertura</div>
+        </div>
+
+        <!-- Conteúdo -->
+        <div style="text-align: center;">
+          <div style="padding: 16px 24px; border-radius: 6px; background: #1f3b5c; font-size: 22px; min-width: 220px; color: #bcd7ff;">Meu Primeiro Título</div>
+          <div style="height: 20px; width: 2px; background: #bcd7ff; margin: 8px auto;"></div>
+          <div style="margin-top: 12px; font-size: 14px; opacity: 0.85; color: #bcd7ff;">Conteúdo</div>
+        </div>
+
+        <!-- Tag de fechamento -->
+        <div style="text-align: center;">
+          <div style="padding: 16px 24px; border-radius: 6px; background: #1f3b5c; font-size: 22px; min-width: 220px; color: #ff7a7a; font-weight: bold;">&lt;/h1&gt;</div>
+          <div style="height: 20px; width: 2px; background: #ff7a7a; margin: 8px auto;"></div>
+          <div style="margin-top: 12px; font-size: 14px; opacity: 0.85; color: #ff7a7a;">Tag de fechamento</div>
+        </div>
+      </div>
+    </div>
+
+     <!-- DEMO INTERATIVO -->
+    <div class="sec-title">▸ demonstração ao vivo</div>
+    <div class="sec-h2">Veja títulos em tempo real</div>
+
+    <div class="demo-section">
+      <h3>🔤 Digite um texto e escolha o nível de título:</h3>
+      <div class="demo-controls">
+        <input class="demo-input" id="demoText" type="text" value="Meu título aqui!" placeholder="Digite seu texto...">
+        <select class="demo-select" id="demoLevel">
+          <option value="h1">&lt;h1&gt; — Principal</option>
+          <option value="h2">&lt;h2&gt; — Subtítulo</option>
+          <option value="h3">&lt;h3&gt; — Seção</option>
+          <option value="h4">&lt;h4&gt; — Sub-seção</option>
+          <option value="h5">&lt;h5&gt; — Detalhe</option>
+          <option value="h6">&lt;h6&gt; — Menor</option>
+        </select>
+        <!-- <button class="run-btn" type="button" id="sendDemoToPlayground">Enviar ao Playground ↓</button> -->
+      </div>
+      <div class="demo-preview-box">
+        <div id="demoOutput" style="color:#1e293b; font-family: Arial, sans-serif; width: 100%;"></div>
+      </div>
+    </div>
+    
+    
+
+    <!-- HEADING VISUALIZER -->
+    <div class="sec-title">▸ visualizador de títulos</div>
+    <div class="sec-h2">Clique em qualquer linha para carregar no playground</div>
+
+    <div class="headings-visual">
+      <div class="hv-header">TAG → TAMANHO VISUAL (clique para usar no playground)</div>
+      <div class="hv-row" data-heading="h1">
+        <div class="hv-tag">&lt;h1&gt;</div>
+        <div class="hv-preview h1">Título Principal</div>
+        <div class="hv-use">→ usar</div>
+      </div>
+      <div class="hv-row" data-heading="h2">
+        <div class="hv-tag">&lt;h2&gt;</div>
+        <div class="hv-preview h2">Subtítulo</div>
+        <div class="hv-use">→ usar</div>
+      </div>
+      <div class="hv-row" data-heading="h3">
+        <div class="hv-tag">&lt;h3&gt;</div>
+        <div class="hv-preview h3">Seção menor</div>
+        <div class="hv-use">→ usar</div>
+      </div>
+      <div class="hv-row" data-heading="h4">
+        <div class="hv-tag">&lt;h4&gt;</div>
+        <div class="hv-preview h4">Sub-seção</div>
+        <div class="hv-use">→ usar</div>
+      </div>
+      <div class="hv-row" data-heading="h5">
+        <div class="hv-tag">&lt;h5&gt;</div>
+        <div class="hv-preview h5">Detalhe menor</div>
+        <div class="hv-use">→ usar</div>
+      </div>
+      <div class="hv-row" data-heading="h6">
+        <div class="hv-tag">&lt;h6&gt;</div>
+        <div class="hv-preview h6">Menor de todos</div>
+        <div class="hv-use">→ usar</div>
+      </div>
+    </div>
+
+    
+
+    <!-- TAG REFERENCE -->
+    <div class="sec-title">▸ tags de formatação de texto</div>
+    <div class="sec-h2">Clique em um card para carregar o exemplo no playground</div>
+
+    <div class="tags-grid">
+      <div class="tag-card" data-tag="p">
+        <div class="tag-code" style="color:#f87171">&lt;p&gt;</div>
+        <div class="preview">Parágrafo normal de texto.</div>
+        <p>Para blocos de texto. O navegador adiciona espaço automático entre parágrafos.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="strong">
+        <div class="tag-code" style="color:#fbbf24">&lt;strong&gt;</div>
+        <div class="preview"><strong>Texto em negrito</strong> aqui.</div>
+        <p>Deixa o texto em negrito e indica importância semântica.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="em">
+        <div class="tag-code" style="color:#34d399">&lt;em&gt;</div>
+        <div class="preview"><em>Texto em itálico</em> aqui.</div>
+        <p>Deixa o texto em itálico e indica ênfase semântica.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="br">
+        <div class="tag-code" style="color:#60a5fa">&lt;br&gt;</div>
+        <div class="preview">Linha 1<br>Linha 2</div>
+        <p>Quebra de linha. Tag vazia — não precisa de fechamento.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="hr">
+        <div class="tag-code" style="color:#a78bfa">&lt;hr&gt;</div>
+        <div class="preview"><hr style="margin:6px 0"></div>
+        <p>Linha horizontal divisória. Também é uma tag vazia.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="mark">
+        <div class="tag-code" style="color:#f59e0b">&lt;mark&gt;</div>
+        <div class="preview">Texto <mark>destacado</mark> aqui.</div>
+        <p>Destaca o texto com fundo amarelo, como um marca-texto.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+    </div>
+
+    
+<!-- PLAYGROUND -->
+    <div class="sec-title">▸ playground interativo</div>
+    <div class="sec-h2">Edite e veja o resultado em tempo real</div>
+
+    <div class="playground">
+      <div class="playground-header">
+        <div class="pg-title"><span>⚡</span><span>Editor ao vivo</span></div>
+        <button class="run-btn" type="button" id="runPlayground">▶ Executar</button>
+      </div>
+      <div class="playground-body">
+        <div class="pg-editor">
+          <div class="pg-editor-tabs">
+            <button class="pg-tab active">HTML</button>
+          </div>
+          <textarea class="pg-textarea" id="htmlEditor" spellcheck="false"><h1>Meu Perfil</h1>
+<h2>Sobre mim</h2>
+<p>Olá! Estou aprendendo <strong>HTML</strong> hoje.</p>
+<p>Minha linguagem favorita é o <em>JavaScript</em>.</p>
+<hr>
+<h2>Meus objetivos</h2>
+<p>Quero criar sites <mark>incríveis</mark>!</p></textarea>
+        </div>
+        <div class="pg-result">
+          <div class="pg-result-label">⬛ Resultado</div>
+          <iframe class="pg-iframe" id="preview"></iframe>
+        </div>
+      </div>
+    </div>
+   
+
+    <!-- EXAMPLES -->
+    <div class="sec-title">▸ exemplos completos — clique para usar</div>
+    <div class="sec-h2">Copie e experimente no Playground</div>
+
+    <div class="examples-grid">
+
+      <div class="ex-card" data-example="0">
+        <div class="ex-card-head">
+          <h3>📰 Artigo com títulos</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;h1&gt;Aprendo HTML&lt;/h1&gt;
+&lt;h2&gt;O que é HTML?&lt;/h2&gt;
+&lt;p&gt;HTML é a linguagem da web.&lt;/p&gt;
+&lt;h2&gt;Por que aprender?&lt;/h2&gt;
+&lt;p&gt;Para criar sites incríveis!&lt;/p&gt;</div>
+        <div class="ex-desc">Estrutura de artigo com h1 e vários h2.</div>
+      </div>
+
+      <div class="ex-card" data-example="1">
+        <div class="ex-card-head">
+          <h3>✨ Com formatação</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;h1&gt;Meu Perfil&lt;/h1&gt;
+&lt;p&gt;Nome: &lt;strong&gt;Ana Silva&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Curso: &lt;em&gt;Desenvolvimento Web&lt;/em&gt;&lt;/p&gt;
+&lt;hr&gt;
+&lt;p&gt;Amo &lt;mark&gt;programação&lt;/mark&gt;!&lt;/p&gt;</div>
+        <div class="ex-desc">Negrito, itálico, linha divisória e destaque.</div>
+      </div>
+
+      <div class="ex-card" data-example="2">
+        <div class="ex-card-head">
+          <h3>🏗️ Hierarquia completa</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;h1&gt;Programação Web&lt;/h1&gt;
+&lt;h2&gt;Front-end&lt;/h2&gt;
+&lt;h3&gt;Linguagens&lt;/h3&gt;
+&lt;p&gt;HTML, CSS e JavaScript.&lt;/p&gt;
+&lt;h3&gt;Frameworks&lt;/h3&gt;
+&lt;p&gt;React, Vue, Angular.&lt;/p&gt;
+&lt;h2&gt;Back-end&lt;/h2&gt;
+&lt;p&gt;Node.js, PHP, Python.&lt;/p&gt;</div>
+        <div class="ex-desc">Hierarquia h1 → h2 → h3 para organizar conteúdo.</div>
+      </div>
+
+      <div class="ex-card" data-example="3">
+        <div class="ex-card-head">
+          <h3>🎨 Com estilo inline</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;h1 style="color:purple"&gt;
+  Título Colorido
+&lt;/h1&gt;
+&lt;p style="font-size:18px"&gt;
+  Texto &lt;strong&gt;maior&lt;/strong&gt; aqui.
+&lt;/p&gt;
+&lt;p style="color:gray"&gt;
+  Texto em cinza.
+&lt;/p&gt;</div>
+        <div class="ex-desc">Estilo diretamente na tag com o atributo style.</div>
+      </div>
+
+    </div>
+
+    
+
+    <!-- QUIZ -->
+    <div class="sec-title">▸ teste seus conhecimentos</div>
+    <div class="sec-h2">Mini Quiz — 3 perguntas rápidas</div>
+
+    <div class="quiz-section">
+      <h3>🧠 Responda sem olhar o código!</h3>
+
+      <div class="quiz-item">
+        <p>1. Qual tag cria o título mais IMPORTANTE (maior) de uma página?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">&lt;h6&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="true">&lt;h1&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;title&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;header&gt;</button>
+        </div>
+        <div class="quiz-feedback" id="qf0"></div>
+      </div>
+
+      <div class="quiz-item">
+        <p>2. Qual tag deixa o texto em <strong>negrito</strong> com significado semântico?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">&lt;b&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="true">&lt;strong&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;bold&gt;</button>
+          <button class="quiz-opt" type="button" data-correct="false">&lt;em&gt;</button>
+        </div>
+        <div class="quiz-feedback" id="qf1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <p>3. A tag &lt;br&gt; precisa de tag de fechamento &lt;/br&gt;?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">Sim, sempre</button>
+          <button class="quiz-opt" type="button" data-correct="true">Não, é tag vazia</button>
+          <button class="quiz-opt" type="button" data-correct="false">Depende do caso</button>
+        </div>
+        <div class="quiz-feedback" id="qf2"></div>
+      </div>
+    </div>
+
+    <!-- EXERCISE -->
+    <div class="exercise-section">
+      <div class="exercise-badge">✏️ EXERCÍCIO 02</div>
+      <h2>Crie um mini-artigo sobre você!</h2>
+      <p>Use o playground acima para montar um artigo completo. Use pelo menos 4 tags diferentes desta aula.</p>
+
+      <ul class="task-list">
+        <li>
+          <span class="task-num">1</span>
+          <div>
+            <strong>Título principal</strong> — Use <code style="color:var(--purple)">&lt;h1&gt;</code> com seu nome completo.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">2</span>
+          <div>
+            <strong>Seção "Sobre mim"</strong> — Use <code style="color:var(--purple)">&lt;h2&gt;</code> como subtítulo e um <code style="color:var(--purple)">&lt;p&gt;</code> com uma apresentação.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">3</span>
+          <div>
+            <strong>Destaque palavras importantes</strong> — Dentro de um parágrafo, use <code style="color:var(--purple)">&lt;strong&gt;</code> em pelo menos 1 palavra.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">4</span>
+          <div>
+            <strong>Linha divisória</strong> — Adicione um <code style="color:var(--purple)">&lt;hr&gt;</code> para separar seções.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">5</span>
+          <div>
+            <strong>Seção "Meus objetivos"</strong> — Novo <code style="color:var(--purple)">&lt;h2&gt;</code> com um parágrafo usando <code style="color:var(--purple)">&lt;mark&gt;</code> em alguma palavra.
+          </div>
+        </li>
+      </ul>
+
+      <button class="answer-toggle" type="button">
+        💡 Ver exemplo de resposta
+      </button>
+      <div class="answer-body" id="answerBody">
+        <pre>&lt;h1&gt;João Silva&lt;/h1&gt;
+
+&lt;h2&gt;Sobre mim&lt;/h2&gt;
+&lt;p&gt;Olá! Sou &lt;strong&gt;estudante de Desenvolvimento Web&lt;/strong&gt;.
+Adoro aprender coisas novas e criar projetos.&lt;/p&gt;
+
+&lt;hr&gt;
+
+&lt;h2&gt;Meus objetivos&lt;/h2&gt;
+&lt;p&gt;Quero me tornar &lt;em&gt;desenvolvedor full-stack&lt;/em&gt; e
+criar &lt;mark&gt;aplicações que ajudem pessoas&lt;/mark&gt;.&lt;/p&gt;
+
+&lt;h3&gt;Tecnologias que estudo&lt;/h3&gt;
+&lt;p&gt;&lt;strong&gt;HTML&lt;/strong&gt;, CSS e JavaScript.&lt;/p&gt;</pre>
+      </div>
+    </div>
+
+    <!-- FOOTER NAV -->
+    <div class="footer-nav">
+      <a href="index.html" class="nav-btn nav-prev">← Página inicial</a>
+      <a href="estrutura-basica.html" class="nav-btn nav-next">Próxima aula: Estrutura Básica →</a>
+    </div>
+
+  </div>
+
+  <script>
+    // ── EXAMPLES ──
+    const examples = [
+      `<h1>Aprendo HTML</h1>\n<h2>O que é HTML?</h2>\n<p>HTML é a linguagem da web.</p>\n<h2>Por que aprender?</h2>\n<p>Para criar sites incríveis!</p>`,
+      `<h1>Meu Perfil</h1>\n<p>Nome: <strong>Ana Silva</strong></p>\n<p>Curso: <em>Desenvolvimento Web</em></p>\n<hr>\n<p>Amo <mark>programação</mark>!</p>`,
+      `<h1>Programação Web</h1>\n<h2>Front-end</h2>\n<h3>Linguagens</h3>\n<p>HTML, CSS e JavaScript.</p>\n<h3>Frameworks</h3>\n<p>React, Vue, Angular.</p>\n<h2>Back-end</h2>\n<p>Node.js, PHP, Python.</p>`,
+      `<h1 style="color:purple">Título Colorido</h1>\n<p style="font-size:18px">Texto <strong>maior</strong> aqui.</p>\n<p style="color:gray">Texto em cinza.</p>`
+    ];
+
+    const tagExamples = {
+      p:      `<p>Este é um parágrafo normal.</p>\n<p>Outro parágrafo separado do anterior.</p>`,
+      strong: `<p>Nome: <strong>João Silva</strong></p>\n<p>Disciplina: <strong>HTML Básico</strong></p>`,
+      em:     `<p>Curso: <em>Desenvolvimento Web</em></p>\n<p>Frase: <em>Aprender é sempre válido!</em></p>`,
+      br:     `<p>Linha um<br>Linha dois<br>Linha três</p>`,
+      hr:     `<h2>Seção 1</h2>\n<p>Conteúdo da primeira seção.</p>\n<hr>\n<h2>Seção 2</h2>\n<p>Conteúdo da segunda seção.</p>`,
+      mark:   `<p>As linguagens mais importantes são <mark>HTML</mark>, <mark>CSS</mark> e <mark>JavaScript</mark>.</p>`
+    };
+
+    const headingExamples = {
+      h1: `<h1>Título Nível 1 — O maior</h1>\n<p>Use apenas um h1 por página.</p>`,
+      h2: `<h1>Meu Site</h1>\n<h2>Subtítulo Nível 2</h2>\n<p>Parágrafos dentro da seção h2.</p>`,
+      h3: `<h2>Seção</h2>\n<h3>Sub-seção Nível 3</h3>\n<p>Conteúdo dentro do h3.</p>`,
+      h4: `<h3>Sub-seção</h3>\n<h4>Detalhe Nível 4</h4>\n<p>Texto dentro do h4.</p>`,
+      h5: `<h4>Detalhe</h4>\n<h5>Nível 5 — menor importância</h5>\n<p>Raro de usar.</p>`,
+      h6: `<h5>Nível 5</h5>\n<h6>Nível 6 — o menor</h6>\n<p>Muito raramente utilizado.</p>`
+    };
+
+    function loadExample(i) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || examples[i] === undefined) return;
+      ed.value = examples[i];
+      document.querySelectorAll('.ex-card').forEach(function (c, j) { c.classList.toggle('active', i === j); });
+      runCode();
+      var pv = document.getElementById('preview');
+      if (pv) pv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function loadTag(tag) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || !tagExamples[tag]) return;
+      ed.value = tagExamples[tag];
+      runCode();
+      var pv = document.getElementById('preview');
+      if (pv) pv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function loadHeading(tag) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || !headingExamples[tag]) return;
+      ed.value = headingExamples[tag];
+      runCode();
+      var pv = document.getElementById('preview');
+      if (pv) pv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ── PLAYGROUND ──
+    function normalizeEditorHtml(html) {
+      const hasEncodedTags = /&lt;|&gt;|&amp;/i.test(html);
+      if (!hasEncodedTags) return html;
+
+      const textarea = document.createElement('textarea');
+      textarea.innerHTML = html;
+      return textarea.value;
+    }
+
+    function runCode() {
+      const editor = document.getElementById('htmlEditor');
+      const iframe = document.getElementById('preview');
+      if (!editor || !iframe) return;
+
+      const html = normalizeEditorHtml(editor.value);
+      const isFullDocument = /<!doctype\s+html|<html[\s>]/i.test(html);
+      if (isFullDocument) {
+        iframe.srcdoc = html;
+        return;
+      }
+
+      iframe.srcdoc = `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{font-family:Arial,sans-serif;padding:16px;line-height:1.6;}h1{color:#1e293b}h2{color:#374151}mark{background:#fef08a}</style></head><body>${html}</body></html>`;
+    }
+
+    // ── DEMO ──
+    function updateDemo() {
+      const textInput = document.getElementById('demoText');
+      const levelInput = document.getElementById('demoLevel');
+      const out = document.getElementById('demoOutput');
+      if (!textInput || !levelInput || !out) return;
+
+      const text = textInput.value || 'Meu título aqui!';
+      const level = levelInput.value;
+      if (!/^h[1-6]$/.test(level)) return;
+
+      const sizes = { h1:'2.2rem',h2:'1.7rem',h3:'1.35rem',h4:'1.1rem',h5:'.9rem',h6:'.8rem' };
+      const weights = { h1:'800',h2:'700',h3:'700',h4:'600',h5:'600',h6:'600' };
+      while (out.firstChild) out.removeChild(out.firstChild);
+      const el = document.createElement(level);
+      el.textContent = text;
+      el.style.fontSize = sizes[level];
+      el.style.fontWeight = weights[level];
+      el.style.margin = '0';
+      el.style.color = '#1e293b';
+      out.appendChild(el);
+    }
+
+    function sendToPlayground() {
+      const textInput = document.getElementById('demoText');
+      const levelInput = document.getElementById('demoLevel');
+      const editor = document.getElementById('htmlEditor');
+      if (!textInput || !levelInput || !editor) return;
+
+      const text = textInput.value || 'Meu título aqui!';
+      const level = levelInput.value;
+      if (!/^h[1-6]$/.test(level)) return;
+
+      const safe = String(text).replace(/[<>]/g, '');
+      editor.value = `<${level}>${safe}</${level}>\n<p>Texto abaixo do título.</p>`;
+      runCode();
+      const preview = document.getElementById('preview');
+      if (preview) preview.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ── QUIZ ──
+    function checkQuiz(btn, correct) {
+      if (!btn || !btn.closest) return;
+      const parent = btn.closest('.quiz-item');
+      if (!parent) return;
+      const opts = parent.querySelectorAll('.quiz-opt');
+      opts.forEach(function (o) { o.style.pointerEvents = 'none'; });
+      btn.classList.add(correct ? 'correct' : 'wrong');
+      const fb = parent.querySelector('.quiz-feedback');
+      if (fb) {
+        fb.textContent = correct ? '✅ Correto! Muito bem!' : '❌ Não é essa. Revise os conceitos acima!';
+        fb.className = 'quiz-feedback ' + (correct ? 'ok' : 'err');
+      }
+    }
+
+    // ── ANSWER ──
+    function toggleAnswer() {
+      const body = document.getElementById('answerBody');
+      if (body) body.classList.toggle('open');
+    }
+
+    function initTitulosPage() {
+      const wrap = document.querySelector('.wrap');
+      if (!wrap) return;
+
+      wrap.addEventListener('click', function (e) {
+        var t = e.target;
+        if (t && t.nodeType !== 1) t = t.parentElement;
+        if (!t || typeof t.closest !== 'function') return;
+
+        if (t.closest('#runPlayground')) {
+          e.preventDefault();
+          runCode();
+          return;
+        }
+        if (t.closest('#sendDemoToPlayground')) {
+          e.preventDefault();
+          sendToPlayground();
+          return;
+        }
+
+        var quizOpt = t.closest('.quiz-opt');
+        if (quizOpt && wrap.contains(quizOpt)) {
+          e.preventDefault();
+          checkQuiz(quizOpt, quizOpt.getAttribute('data-correct') === 'true');
+          return;
+        }
+
+        var ansBtn = t.closest('.answer-toggle');
+        if (ansBtn && wrap.contains(ansBtn)) {
+          e.preventDefault();
+          toggleAnswer();
+          return;
+        }
+
+        var useBtn = t.closest('.use-btn');
+        if (useBtn && wrap.contains(useBtn)) {
+          e.preventDefault();
+          var exFromBtn = useBtn.closest('.ex-card[data-example]');
+          if (exFromBtn) {
+            var idxBtn = parseInt(exFromBtn.getAttribute('data-example'), 10);
+            if (!Number.isNaN(idxBtn)) loadExample(idxBtn);
+          }
+          return;
+        }
+
+        var row = t.closest('.hv-row[data-heading]');
+        if (row && wrap.contains(row)) {
+          var h = row.getAttribute('data-heading');
+          if (h) loadHeading(h);
+          return;
+        }
+
+        var tagCard = t.closest('.tag-card[data-tag]');
+        if (tagCard && wrap.contains(tagCard)) {
+          var tg = tagCard.getAttribute('data-tag');
+          if (tg) loadTag(tg);
+          return;
+        }
+
+        var exCard = t.closest('.ex-card[data-example]');
+        if (exCard && wrap.contains(exCard)) {
+          var i = parseInt(exCard.getAttribute('data-example'), 10);
+          if (!Number.isNaN(i)) loadExample(i);
+        }
+      });
+
+      var demoTextInput = document.getElementById('demoText');
+      var demoLevelSelect = document.getElementById('demoLevel');
+      var htmlEditor = document.getElementById('htmlEditor');
+
+      if (demoTextInput) demoTextInput.addEventListener('input', updateDemo);
+      if (demoLevelSelect) {
+        demoLevelSelect.addEventListener('change', updateDemo);
+        demoLevelSelect.addEventListener('input', updateDemo);
+      }
+
+      var timer;
+      if (htmlEditor) {
+        htmlEditor.addEventListener('input', function () {
+          clearTimeout(timer);
+          timer = setTimeout(runCode, 500);
+        });
+      }
+
+      updateDemo();
+      runCode();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initTitulosPage);
+    } else {
+      initTitulosPage();
+    }
+  </script>
+
+</body>
+</html>

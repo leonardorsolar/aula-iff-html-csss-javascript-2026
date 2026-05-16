@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 02 — Estrutura Básica HTML</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0f172a;
+      --dark:   #1e293b;
+      --panel:  #1a2744;
+      --blue:   #3b82f6;
+      --cyan:   #06b6d4;
+      --amber:  #f59e0b;
+      --green:  #10b981;
+      --red:    #ef4444;
+      --orange: #fb923c;
+      --white:  #f8fafc;
+      --muted:  #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,.06) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.06) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+
+    .back-btn {
+      text-decoration: none; color: var(--muted);
+      font-size: 13px; display: flex; align-items: center; gap: 6px;
+      transition: color .2s;
+    }
+    .back-btn:hover { color: var(--white); }
+
+    .topbar-pill {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      background: rgba(251,146,60,.15); color: var(--orange);
+      border: 1px solid rgba(251,146,60,.3); border-radius: 100px;
+      padding: 4px 12px; letter-spacing: 1px;
+    }
+
+    .topbar-right { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+
+    /* ── LAYOUT ── */
+    .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── PAGE HEADER ── */
+    .page-header { padding: 48px 0 40px; }
+
+    .lesson-tag {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--orange);
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+
+    .page-header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 12px; }
+    .page-header p  { font-size: 1rem; color: var(--muted); line-height: 1.7; max-width: 640px; }
+
+    /* ── CONCEPT CARDS ── */
+    .concepts-row {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin: 36px 0;
+    }
+
+    .concept-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 12px; padding: 20px;
+    }
+    .concept-card .tag {
+      font-family: 'Space Mono', monospace; font-size: 13px;
+      font-weight: 700; margin-bottom: 8px;
+    }
+    .concept-card p { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── SECTION TITLE ── */
+    .sec-title {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--cyan);
+      text-transform: uppercase; margin-bottom: 12px; margin-top: 48px;
+    }
+
+    .sec-h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; color: var(--white); }
+
+    /* ── ESTRUTURA PRINCIPAL (como o desenho da aula) ── */
+    .wrapper {
+      display: flex;
+      gap: 22px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      margin-bottom: 36px;
+    }
+
+    .wrapper .box {
+      width: 320px;
+      max-width: 100%;
+      background: #d9d9d9;
+      border: 1px solid #b7b7b7;
+      padding: 14px;
+      color: #111827;
+    }
+
+    .wrapper .title {
+      border: 1px solid #8f8f8f;
+      background: #ececec;
+      padding: 10px 12px;
+      margin-bottom: 12px;
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      text-align: center;
+      color: #111827;
+    }
+
+    .wrapper .inner,
+    .wrapper .code {
+      border: 1px solid #8f8f8f;
+      background: #f4f4f4;
+      margin-bottom: 12px;
+      padding: 16px 14px;
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      line-height: 1.3;
+      color: #111827;
+      letter-spacing: .2px;
+    }
+
+    .wrapper .code {
+      font-family: 'Space Mono', monospace;
+      font-size: 20px;
+      white-space: normal;
+    }
+
+    .wrapper .big {
+      min-height: 124px;
+      align-items: flex-start;
+      padding-top: 18px;
+    }
+
+    .wrapper .box .inner:last-child,
+    .wrapper .box .code:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 760px) {
+      .wrapper .box {
+        width: 100%;
+      }
+
+      .wrapper .inner,
+      .wrapper .code {
+        font-size: 16px;
+      }
+
+      .wrapper .code {
+        font-size: 17px;
+      }
+    }
+
+    /* ── BLOCO DE CÓDIGO (acima das 5 tags) ── */
+    .html-structure-sample {
+      background: #020617;
+      border: 1px solid #1e293b;
+      border-radius: 14px;
+      padding: 22px 24px;
+      margin-bottom: 28px;
+      overflow-x: auto;
+    }
+
+    .html-structure-sample pre {
+      margin: 0;
+      font-family: 'Space Mono', monospace;
+      font-size: 16px;
+      line-height: 1.7;
+      white-space: pre;
+      color: #e5e7eb;
+    }
+
+    .tag-doc { color: #9ca3af; }
+    .tag-html { color: #fde047; }
+    .tag-head,
+    .tag-body { color: #22c55e; }
+    .tag-meta { color: #38bdf8; }
+    .tag-title,
+    .tag-h1 { color: #f87171; }
+    .tag-attr { color: #fbbf24; }
+    .tag-value { color: #e5e7eb; }
+    .txt { color: #e5e7eb; }
+
+    .hl {
+      background: rgba(250, 204, 21, .18);
+      padding: 1px 2px;
+    }
+
+    .line-guide {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+      margin: 0 0 36px;
+    }
+
+    .line-guide h3 {
+      font-size: .98rem;
+      margin-bottom: 12px;
+      color: var(--orange);
+      font-weight: 700;
+    }
+
+    .line-guide ul {
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .line-guide li {
+      border-bottom: 1px dashed rgba(148,163,184,.22);
+      padding-bottom: 8px;
+    }
+
+    .line-guide li:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .line-guide code {
+      color: #7dd3fc;
+      font-family: 'Space Mono', monospace;
+      font-size: .82rem;
+    }
+
+    /* ── EXAMPLES GRID ── */
+    .examples-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 48px;
+    }
+
+    .ex-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .ex-card:hover { border-color: var(--orange); transform: translateY(-3px); }
+    .ex-card.active { border-color: var(--orange); box-shadow: 0 0 0 2px rgba(251,146,60,.2); }
+
+    .ex-card-head {
+      padding: 16px 18px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ex-card-head h3 { font-size: .95rem; font-weight: 700; }
+    .use-btn {
+      font-size: 11px; padding: 4px 12px; border-radius: 100px;
+      background: var(--orange); color: var(--navy);
+      border: none; cursor: pointer; font-weight: 700;
+      font-family: 'Space Mono', monospace;
+      transition: opacity .2s;
+    }
+    .use-btn:hover { opacity: .85; }
+
+    .ex-code {
+      background: #0d1b2e;
+      padding: 14px 18px;
+      font-family: 'Space Mono', monospace;
+      font-size: 11.5px; line-height: 1.7;
+      color: #7dd3fc; white-space: pre;
+      overflow-x: auto;
+    }
+
+    .ex-desc { padding: 12px 18px 16px; font-size: .8rem; color: var(--muted); }
+
+    /* ── PLAYGROUND ── */
+    .playground {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; margin-bottom: 56px;
+    }
+
+    .playground-header {
+      background: #0d1b2e;
+      padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .pg-title { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+
+    .run-btn {
+      background: var(--green); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 8px 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 6px;
+      transition: background .2s;
+      font-family: 'Sora', sans-serif;
+    }
+    .run-btn:hover { background: #059669; }
+
+    .playground-body {
+      display: grid; grid-template-columns: 1fr 1fr;
+      min-height: 400px;
+    }
+
+    @media(max-width: 700px) { .playground-body { grid-template-columns: 1fr; } }
+
+    .pg-editor { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+
+    .pg-editor-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      background: #0d1b2e;
+    }
+    .pg-tab {
+      padding: 10px 18px; font-family: 'Space Mono', monospace; font-size: 11px;
+      color: var(--muted); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent; transition: color .2s, border-color .2s;
+    }
+    .pg-tab.active { color: var(--orange); border-bottom-color: var(--orange); }
+
+    .pg-textarea {
+      flex: 1; background: #0d1b2e; border: none; outline: none;
+      color: #7dd3fc; font-family: 'Space Mono', monospace;
+      font-size: 12.5px; line-height: 1.8;
+      padding: 20px; resize: none; width: 100%;
+      min-height: 360px;
+    }
+
+    .pg-result {
+      display: flex; flex-direction: column;
+    }
+
+    .pg-result-label {
+      padding: 10px 18px;
+      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: var(--dark);
+    }
+
+    .pg-iframe {
+      flex: 1; border: none; background: #fff;
+      min-height: 360px; width: 100%;
+    }
+
+    /* ── EXERCISE ── */
+    .exercise-section {
+      background: #1c1a0d;
+      border: 1px solid rgba(245,158,11,.25);
+      border-radius: 16px; padding: 32px; margin-bottom: 56px;
+    }
+
+    .exercise-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(245,158,11,.15); color: var(--amber);
+      border: 1px solid rgba(245,158,11,.3);
+      border-radius: 100px; padding: 6px 16px;
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      font-weight: 700; letter-spacing: 1px; margin-bottom: 18px;
+    }
+
+    .exercise-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+    .exercise-section > p { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 24px; }
+
+    .task-list { list-style: none; margin-bottom: 28px; }
+    .task-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(245,158,11,.1);
+      font-size: .9rem;
+    }
+    .task-list li:last-child { border-bottom: none; }
+
+    .task-num {
+      flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(245,158,11,.2); color: var(--amber);
+      font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .task-done { cursor: pointer; }
+    .task-done input { accent-color: var(--amber); cursor: pointer; }
+
+    /* Answer accordion */
+    .answer-toggle {
+      background: rgba(245,158,11,.1); border: 1px solid rgba(245,158,11,.25);
+      border-radius: 10px; padding: 14px 18px; cursor: pointer;
+      font-size: .9rem; color: var(--amber); font-weight: 600;
+      width: 100%; text-align: left; display: flex; align-items: center; gap: 8px;
+    }
+
+    .answer-body {
+      background: #0d1b2e; border: 1px solid rgba(245,158,11,.15);
+      border-top: none; border-radius: 0 0 10px 10px;
+      padding: 18px; display: none;
+    }
+    .answer-body.open { display: block; }
+
+    .answer-body pre {
+      font-family: 'Space Mono', monospace; font-size: 12px;
+      color: #7dd3fc; line-height: 1.7;
+    }
+
+    /* ── ESTRUTURA SEMÂNTICA (final da página) ── */
+    .semantic-wrap {
+      margin-bottom: 56px;
+    }
+
+    .semantic-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+
+    .semantic-card {
+      background: #d9d9d9;
+      border: 1px solid #b7b7b7;
+      padding: 10px;
+      color: #1f2937;
+    }
+
+    .semantic-row {
+      border: 2px solid #5f5f5f;
+      background: #ececec;
+      min-height: 42px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .semantic-body-row {
+      display: grid;
+      grid-template-columns: 1fr 0.42fr;
+      gap: 6px;
+      margin-bottom: 6px;
+    }
+
+    .semantic-content,
+    .semantic-sidebar {
+      border: 2px solid #5f5f5f;
+      background: #ececec;
+      min-height: 154px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      letter-spacing: .4px;
+      text-transform: uppercase;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .semantic-code {
+      border: 1px solid #8f8f8f;
+      background: #f4f4f4;
+      min-height: 34px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 33px;
+      line-height: 1;
+      font-family: 'Space Mono', monospace;
+      color: #111827;
+    }
+
+    .semantic-code-row {
+      display: grid;
+      grid-template-columns: 1fr 0.42fr;
+      gap: 6px;
+      margin-bottom: 6px;
+      min-height: 140px;
+    }
+
+    .semantic-code-stack {
+      display: grid;
+      grid-template-rows: 1fr 1fr;
+      gap: 6px;
+    }
+
+    .semantic-code:last-child,
+    .semantic-row:last-child,
+    .semantic-content:last-child,
+    .semantic-sidebar:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ── FOOTER NAV ── */
+    .footer-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 32px 0 48px; border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: 16px;
+    }
+
+    .nav-btn {
+      text-decoration: none; padding: 12px 24px;
+      border-radius: 10px; font-size: .9rem; font-weight: 600;
+      display: flex; align-items: center; gap: 8px;
+      transition: transform .2s;
+    }
+    .nav-btn:hover { transform: translateY(-2px); }
+    .nav-prev { background: var(--dark); border: 1px solid var(--border); color: var(--muted); }
+    .nav-next { background: var(--blue); color: #fff; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn">← Voltar</a>
+      <span class="topbar-pill">AULA 02</span>
+    </div>
+    <div class="topbar-right">estrutura-basica.html</div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- PAGE HEADER -->
+    <div class="page-header">
+      <div class="lesson-tag">▸ Aula 02 de 05</div>
+      <h1>🏠 Estrutura Básica do HTML</h1>
+      <p>Toda página web segue a mesma estrutura. Aprenda as 5 tags fundamentais que formam o esqueleto de qualquer site do mundo.</p>
+    </div>
+
+    <div class="sec-title">▸ Estrutura Principal</div>
+    <div class="wrapper">
+      <!-- VISUAL -->
+      <div class="box">
+        <div class="title">Estrutura principal</div>
+        <div class="inner">Cabeçalho</div>
+        <div class="inner big">Corpo</div>
+      </div>
+
+      <!-- CÓDIGO -->
+      <div class="box">
+        <div class="code">&lt;HTML&gt;</div>
+        <div class="code">&lt;HEAD&gt;&lt;/HEAD&gt;</div>
+        <div class="code big">&lt;BODY&gt;<br><br>&lt;/BODY&gt;</div>
+        <div class="code">&lt;/HTML&gt;</div>
+      </div>
+    </div>
+
+    <div class="html-structure-sample">
+      <pre><span class="tag-doc">&lt;!DOCTYPE html&gt;</span>
+<span class="tag-html">&lt;html &gt;</span>
+  <span class="tag-head">&lt;head&gt;</span>
+    <span class="tag-title">&lt;title&gt;</span><span class="txt">Documento</span><span class="tag-title">&lt;/title&gt;</span>
+  <span class="tag-head">&lt;/head&gt;</span>
+  <span class="tag-body hl">&lt;body&gt;</span>
+    <span class="txt"> </span>
+  <span class="tag-body hl">&lt;/body&gt;</span>
+<span class="tag-html">&lt;/html&gt;</span></pre>
+    </div>
+
+    <!-- CONCEPT CARDS -->
+    <div class="sec-title">▸ as 5 tags essenciais</div>
+    <div class="concepts-row">
+      <div class="concept-card">
+        <div class="tag" style="color:#f59e0b">&lt;!DOCTYPE html&gt;</div>
+        <p>Avisa ao navegador que este é um documento HTML5. Sempre na primeira linha.</p>
+      </div>
+      <div class="concept-card">
+        <div class="tag" style="color:#60a5fa">&lt;html&gt;</div>
+        <p>Elemento raiz. Envolve todo o conteúdo da página. Tudo fica dentro dele.</p>
+      </div>
+      <div class="concept-card">
+        <div class="tag" style="color:#34d399">&lt;head&gt;</div>
+        <p>Informações sobre a página — invisíveis para o usuário: título, estilos, meta.</p>
+      </div>
+      <div class="concept-card">
+        <div class="tag" style="color:#a78bfa">&lt;title&gt;</div>
+        <p>O texto que aparece na aba do navegador (não na página em si).</p>
+      </div>
+      <div class="concept-card">
+        <div class="tag" style="color:#f87171">&lt;body&gt;</div>
+        <p>Tudo que o usuário vê na tela fica aqui: títulos, textos, imagens, botões.</p>
+      </div>
+    </div>
+
+    <!-- EXAMPLES -->
+    <div class="sec-title">▸ exemplos prontos — clique para usar</div>
+    <div class="sec-h2">Copie e experimente no Playground</div>
+
+    <div class="examples-grid">
+
+      <div class="ex-card" data-example="0">
+        <div class="ex-card-head">
+          <h3>🏠 Estrutura mínima</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Minha Página&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Bem-vindo!&lt;/h1&gt;
+  &lt;p&gt;Minha primeira página.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+        <div class="ex-desc">A estrutura mais simples possível. Todo site começa assim.</div>
+      </div>
+
+      <div class="ex-card" data-example="1">
+        <div class="ex-card-head">
+          <h3>🎨 Com estilo no head</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Com Estilo&lt;/title&gt;
+  &lt;style&gt;
+    body { background: #1e293b;
+           color: white; }
+    h1   { color: #06b6d4; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Página com estilo!&lt;/h1&gt;
+  &lt;p&gt;O CSS fica no head.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+        <div class="ex-desc">O CSS pode ficar dentro de uma tag style no head.</div>
+      </div>
+
+      <div class="ex-card" data-example="2">
+        <div class="ex-card-head">
+          <h3>📋 Página completa</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;Página Completa&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Título Principal&lt;/h1&gt;
+  &lt;p&gt;Primeiro parágrafo.&lt;/p&gt;
+  &lt;p&gt;Segundo parágrafo.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+        <div class="ex-desc">Versão profissional com lang e charset declarados.</div>
+      </div>
+
+    </div>
+
+    <!-- PLAYGROUND -->
+    <div class="sec-title">▸ playground interativo</div>
+    <div class="sec-h2">Edite o código e veja o resultado ao vivo</div>
+
+    <div class="playground">
+      <div class="playground-header">
+        <div class="pg-title">
+          <span>⚡</span> <span>Editor ao vivo</span>
+        </div>
+        <button class="run-btn" type="button" id="runPlayground">▶ Executar</button>
+      </div>
+      <div class="playground-body">
+        <div class="pg-editor">
+          <div class="pg-editor-tabs">
+            <button class="pg-tab active">HTML</button>
+          </div>
+          <textarea class="pg-textarea" id="htmlEditor" spellcheck="false"><!DOCTYPE html>
+<html>
+<head>
+  <title>Minha Página</title>
+</head>
+<body>
+  <h1>Bem-vindo!</h1>
+  <p>Esta é minha primeira página web.</p>
+</body>
+</html></textarea>
+        </div>
+        <div class="pg-result">
+          <div class="pg-result-label">⬛ Resultado</div>
+          <iframe class="pg-iframe" id="preview"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="html-structure-sample">
+      <pre><span class="tag-doc">&lt;!DOCTYPE html&gt;</span>
+<span class="tag-html">&lt;html <span class="tag-attr">lang=</span><span class="tag-value">"pt-BR"</span>&gt;</span>
+  <span class="tag-head">&lt;head&gt;</span>
+    <span class="tag-meta">&lt;meta <span class="tag-attr">charset=</span><span class="tag-value">"UTF-8"</span>&gt;</span>
+    <span class="tag-meta">&lt;meta <span class="tag-attr">name=</span><span class="tag-value">"viewport"</span> <span class="tag-attr">content=</span><span class="tag-value">"width=device-width, initial-scale=1.0"</span>&gt;</span>
+    <span class="tag-title">&lt;title&gt;</span><span class="txt">Documento</span><span class="tag-title">&lt;/title&gt;</span>
+  <span class="tag-head">&lt;/head&gt;</span>
+  <span class="tag-body hl">&lt;body&gt;</span>
+    <span class="txt"> </span>
+  <span class="tag-body hl">&lt;/body&gt;</span>
+<span class="tag-html">&lt;/html&gt;</span></pre>
+    </div>
+
+    <div class="line-guide">
+      <h3>🧠 Explicação linha a linha (para dev júnior)</h3>
+      <ul>
+        <li><code>&lt;!DOCTYPE html&gt;</code> — Diz ao navegador que o documento usa HTML5.</li>
+        <li><code>&lt;html lang="pt-BR"&gt;</code> — Inicia a página e define o idioma principal para português do Brasil (ajuda SEO e acessibilidade).</li>
+        <li><code>&lt;head&gt;</code> — Área de configurações da página (não aparece no conteúdo visível).</li>
+        <li><code>&lt;meta charset="UTF-8"&gt;</code> — Permite acentos e caracteres especiais corretamente (ç, ã, é).</li>
+        <li><code>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</code> — Faz a página se adaptar bem em celular e tablet.</li>
+        <li><code>&lt;title&gt;Documento&lt;/title&gt;</code> — Texto que aparece na aba do navegador.</li>
+        <li><code>&lt;/head&gt;</code> — Fecha a área de configurações.</li>
+        <li><code>&lt;body&gt;</code> — Início do conteúdo visível: títulos, textos, imagens, botões etc.</li>
+        <li><code>&lt;/body&gt;</code> — Fecha o conteúdo visível da página.</li>
+        <li><code>&lt;/html&gt;</code> — Fecha o documento HTML.</li>
+      </ul>
+    </div>
+
+    <!-- EXERCISE -->
+    <div class="exercise-section">
+      <div class="exercise-badge">✏️ EXERCÍCIO 01</div>
+      <h2>Hora de praticar!</h2>
+      <p>Use o playground acima para completar as tarefas abaixo. Cada uma vai reforçar um conceito diferente da estrutura básica do HTML.</p>
+
+      <ul class="task-list">
+        <li>
+          <span class="task-num">1</span>
+          <div>
+            <strong>Altere o título da aba</strong> — Mude o texto dentro de <code style="color:#f59e0b">&lt;title&gt;</code> para o seu nome. Observe a mudança na aba (no preview, veja o título no topo).
+          </div>
+        </li>
+        <li>
+          <span class="task-num">2</span>
+          <div>
+            <strong>Adicione mais conteúdo no body</strong> — Escreva mais um parágrafo <code style="color:#f87171">&lt;p&gt;</code> com seu curso ou profissão desejada.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">3</span>
+          <div>
+            <strong>Adicione uma tag style</strong> — Dentro do <code style="color:#34d399">&lt;head&gt;</code>, adicione <code style="color:#34d399">&lt;style&gt; body { background: lightblue; } &lt;/style&gt;</code> e veja a página mudar de cor.
+          </div>
+        </li>
+        <li>
+          <span class="task-num">4</span>
+          <div>
+            <strong>Atributo lang</strong> — Adicione <code style="color:#60a5fa">lang="pt-BR"</code> dentro da tag <code style="color:#60a5fa">&lt;html&gt;</code>. Isso é boa prática de acessibilidade!
+          </div>
+        </li>
+      </ul>
+
+      <button class="answer-toggle" type="button">
+        💡 Ver resposta do exercício 3
+      </button>
+      <div class="answer-body" id="answerBody">
+        <pre>&lt;!DOCTYPE html&gt;
+&lt;html lang="pt-BR"&gt;
+&lt;head&gt;
+  &lt;meta charset="UTF-8"&gt;
+  &lt;title&gt;João Silva&lt;/title&gt;
+  &lt;style&gt;
+    body { background: lightblue; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;h1&gt;Bem-vindo!&lt;/h1&gt;
+  &lt;p&gt;Esta é minha primeira página web.&lt;/p&gt;
+  &lt;p&gt;Sou estudante de Desenvolvimento Web.&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</pre>
+      </div>
+    </div>
+
+    <div class="semantic-wrap">
+      <div class="sec-title">▸ Estrutura semântica da página</div>
+      <div class="semantic-grid">
+        <div class="semantic-card">
+          <div class="semantic-row">HEADER</div>
+          <div class="semantic-row">NAVIGATION</div>
+          <div class="semantic-body-row">
+            <div class="semantic-content">CONTENT</div>
+            <div class="semantic-sidebar">SIDEBAR</div>
+          </div>
+          <div class="semantic-row">FOOTER</div>
+        </div>
+
+        <div class="semantic-card">
+          <div class="semantic-code">&lt;header&gt;</div>
+          <div class="semantic-code">&lt;nav&gt;</div>
+          <div class="semantic-code-row">
+            <div class="semantic-code-stack">
+              <div class="semantic-code">&lt;section&gt;</div>
+              <div class="semantic-code">&lt;article&gt;</div>
+            </div>
+            <div class="semantic-code">&lt;aside&gt;</div>
+          </div>
+          <div class="semantic-code">&lt;footer&gt;</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER NAV -->
+    <div class="footer-nav">
+      <a href="titulos-e-textos.html" class="nav-btn nav-prev">← Aula anterior: Títulos e Textos</a>
+      <a href="links-imagens.html" class="nav-btn nav-next">Ver todas as aulas →</a>
+    </div>
+
+  </div>
+
+ 
+
+  <script>
+    const examples = [
+      `<!DOCTYPE html>\n<html>\n<head>\n  <title>Minha Página</title>\n</head>\n<body>\n  <h1>Bem-vindo!</h1>\n  <p>Minha primeira página.</p>\n</body>\n</html>`,
+      `<!DOCTYPE html>\n<html>\n<head>\n  <title>Com Estilo</title>\n  <style>\n    body { background: #1e293b; color: white; font-family: sans-serif; }\n    h1   { color: #06b6d4; }\n  </style>\n</head>\n<body>\n  <h1>Página com estilo!</h1>\n  <p>O CSS fica dentro de uma tag style no head.</p>\n</body>\n</html>`,
+      `<!DOCTYPE html>\n<html lang="pt-BR">\n<head>\n  <meta charset="UTF-8">\n  <title>Página Completa</title>\n</head>\n<body>\n  <h1>Título Principal</h1>\n  <p>Primeiro parágrafo.</p>\n  <p>Segundo parágrafo.</p>\n</body>\n</html>`
+    ];
+
+    function loadExample(i) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || examples[i] === undefined) return;
+      ed.value = examples[i];
+      document.querySelectorAll('.ex-card').forEach(function (c, j) { c.classList.toggle('active', i === j); });
+      runCode();
+    }
+
+    function normalizeEditorHtml(html) {
+      const hasEncodedTags = /&lt;|&gt;|&amp;/i.test(html);
+      if (!hasEncodedTags) return html;
+
+      const textarea = document.createElement('textarea');
+      textarea.innerHTML = html;
+      return textarea.value;
+    }
+
+    function ensureHtmlDocument(html) {
+      const isFullDocument = /<!doctype\s+html|<html[\s>]/i.test(html);
+      if (isFullDocument) return html;
+
+      return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Preview</title>
+</head>
+<body>
+${html}
+</body>
+</html>`;
+    }
+
+    function runCode() {
+      const editor = document.getElementById('htmlEditor');
+      const iframe = document.getElementById('preview');
+      if (!editor || !iframe) return;
+      const html = ensureHtmlDocument(normalizeEditorHtml(editor.value));
+      iframe.srcdoc = html;
+    }
+
+    function toggleAnswer() {
+      const body = document.getElementById('answerBody');
+      if (body) body.classList.toggle('open');
+    }
+
+    function initEstruturaPage() {
+      const wrap = document.querySelector('.wrap');
+      if (!wrap) return;
+
+      wrap.addEventListener('click', function (e) {
+        var t = e.target;
+        if (t && t.nodeType !== 1) t = t.parentElement;
+        if (!t || typeof t.closest !== 'function') return;
+        if (t.closest('#runPlayground')) {
+          e.preventDefault();
+          runCode();
+          return;
+        }
+        var useBtn = t.closest('.use-btn');
+        if (useBtn && wrap.contains(useBtn)) {
+          e.preventDefault();
+          var exFromBtn = useBtn.closest('.ex-card[data-example]');
+          if (exFromBtn) {
+            var idx = parseInt(exFromBtn.getAttribute('data-example'), 10);
+            if (!Number.isNaN(idx)) loadExample(idx);
+          }
+          return;
+        }
+        var exCard = t.closest('.ex-card[data-example]');
+        if (exCard && wrap.contains(exCard)) {
+          var i = parseInt(exCard.getAttribute('data-example'), 10);
+          if (!Number.isNaN(i)) loadExample(i);
+          return;
+        }
+        var ans = t.closest('.answer-toggle');
+        if (ans && wrap.contains(ans)) {
+          e.preventDefault();
+          toggleAnswer();
+        }
+      });
+
+      var htmlEditor = document.getElementById('htmlEditor');
+      var timer;
+      if (htmlEditor) {
+        htmlEditor.addEventListener('input', function () {
+          clearTimeout(timer);
+          timer = setTimeout(runCode, 600);
+        });
+      }
+
+      runCode();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initEstruturaPage);
+    } else {
+      initEstruturaPage();
+    }
+  </script>
+
+</body>
+</html>

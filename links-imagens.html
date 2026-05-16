@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 03 — Links e Imagens</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0f172a;
+      --dark:   #1e293b;
+      --blue:   #3b82f6;
+      --cyan:   #06b6d4;
+      --mint:   #2dd4bf;
+      --mint-dim: rgba(45,212,191,.12);
+      --coral:  #fb7185;
+      --amber:  #fbbf24;
+      --green:  #10b981;
+      --red:    #ef4444;
+      --purple: #a78bfa;
+      --white:  #f8fafc;
+      --muted:  #94a3b8;
+      --border: #334155;
+    }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(45,212,191,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(45,212,191,.055) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none; z-index: 0;
+    }
+
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,23,42,.9); backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 56px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 16px; }
+    .back-btn {
+      text-decoration: none; color: var(--muted); font-size: 13px;
+      display: flex; align-items: center; gap: 6px; transition: color .2s;
+    }
+    .back-btn:hover { color: var(--white); }
+    .topbar-pill {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      background: var(--mint-dim); color: var(--mint);
+      border: 1px solid rgba(45,212,191,.35); border-radius: 100px;
+      padding: 4px 12px; letter-spacing: 1px;
+    }
+    .topbar-right { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--muted); }
+
+    .wrap { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+    .page-header { padding: 48px 0 40px; }
+    .lesson-tag {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--mint);
+      text-transform: uppercase; margin-bottom: 12px;
+    }
+    .page-header h1 { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; margin-bottom: 12px; }
+    .page-header p  { font-size: 1rem; color: var(--muted); line-height: 1.7; max-width: 680px; }
+
+    .sec-title {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; color: var(--cyan);
+      text-transform: uppercase; margin-bottom: 12px; margin-top: 48px;
+    }
+    .sec-h2 { font-size: 1.35rem; font-weight: 700; margin-bottom: 20px; color: var(--white); }
+
+    /* Anatomia interativa */
+    .anatomy-wrap {
+      background: var(--dark); border: 1px solid rgba(45,212,191,.28);
+      border-radius: 16px; padding: 28px 24px 32px; margin-bottom: 40px;
+      overflow: hidden;
+    }
+    .anatomy-tabs {
+      display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px;
+    }
+    .anatomy-tab {
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      padding: 10px 18px; border-radius: 100px; border: 1px solid var(--border);
+      background: #0d1b2e; color: var(--muted); cursor: pointer;
+      transition: border-color .2s, color .2s, background .2s;
+    }
+    .anatomy-tab:hover { border-color: var(--mint); color: var(--white); }
+    .anatomy-tab.active {
+      background: var(--mint-dim); border-color: var(--mint); color: var(--mint);
+      font-weight: 700;
+    }
+    .anatomy-panel { display: none; }
+    .anatomy-panel.active { display: block; }
+    .anatomy-flow {
+      display: flex; align-items: center; justify-content: center;
+      flex-wrap: wrap; gap: 12px 20px;
+      font-family: 'Space Mono', monospace;
+    }
+    .anatomy-box {
+      padding: 14px 20px; border-radius: 10px; text-align: center;
+      border: 1px solid var(--border); background: #0d1b2e;
+    }
+    .anatomy-box .label { font-size: 10px; color: var(--muted); margin-top: 8px; font-family: 'Sora', sans-serif; }
+    .ab-open { color: #6ee7b7; font-size: 15px; font-weight: 700; }
+    .ab-mid  { color: #7dd3fc; font-size: 14px; max-width: 260px; }
+    .ab-close{ color: #fda4af; font-size: 15px; font-weight: 700; }
+    .anatomy-arrow { color: var(--mint); font-size: 20px; opacity: .8; }
+
+    /* Demo link + imagem */
+    .demo-section {
+      background: var(--dark); border: 1px solid rgba(45,212,191,.22);
+      border-radius: 16px; padding: 28px; margin-bottom: 40px;
+    }
+    .demo-section h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 18px; }
+    .demo-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 24px;
+    }
+    @media(max-width: 820px) { .demo-grid { grid-template-columns: 1fr; } }
+
+    .demo-controls { display: flex; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+    .demo-input, .demo-select {
+      background: #0d1b2e; border: 1px solid var(--border); border-radius: 8px;
+      padding: 10px 14px; color: var(--white); font-size: .9rem; outline: none;
+    }
+    .demo-input { flex: 1; min-width: 160px; font-family: 'Sora', sans-serif; }
+    .demo-input:focus, .demo-select:focus { border-color: var(--mint); }
+    .demo-select { font-family: 'Space Mono', monospace; font-size: 12px; cursor: pointer; }
+
+    .demo-preview-box {
+      background: #fff; border-radius: 10px; padding: 22px 24px;
+      min-height: 100px; color: #1e293b;
+    }
+    .demo-preview-box a { color: #0d9488; font-weight: 600; }
+    .demo-preview-box img { display: block; border-radius: 8px; margin-top: 8px; }
+
+    .code-strip {
+      background: #0a1628; border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 14px; margin-top: 14px;
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      color: #7dd3fc; line-height: 1.65; overflow-x: auto; white-space: pre-wrap;
+      word-break: break-all;
+    }
+
+    .demo-check {
+      display: flex; align-items: center; gap: 8px;
+      font-size: .85rem; color: var(--muted); cursor: pointer; user-select: none;
+    }
+    .demo-check input { accent-color: var(--mint); width: 16px; height: 16px; }
+
+    .range-row { display: flex; align-items: center; gap: 14px; margin-top: 12px; }
+    .range-row input[type="range"] { flex: 1; accent-color: var(--mint); }
+
+    /* Mapa de destinos */
+    .dest-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px; margin-bottom: 44px;
+    }
+    .dest-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+      text-align: left;
+    }
+    .dest-card:hover {
+      border-color: var(--mint); transform: translateY(-3px);
+    }
+    .dest-icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .dest-card h4 { font-size: .95rem; margin-bottom: 6px; }
+    .dest-card p { font-size: .78rem; color: var(--muted); line-height: 1.55; }
+    .dest-hint {
+      margin-top: 10px; font-family: 'Space Mono', monospace;
+      font-size: 10px; color: var(--mint);
+    }
+
+    /* Tag cards */
+    .tags-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 14px; margin-bottom: 44px;
+    }
+    .tag-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 12px; padding: 18px; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .tag-card:hover { border-color: var(--mint); transform: translateY(-2px); }
+    .tag-code {
+      font-family: 'Space Mono', monospace; font-size: 14px;
+      font-weight: 700; margin-bottom: 8px;
+    }
+    .tag-card p { font-size: .8rem; color: var(--muted); line-height: 1.6; }
+    .load-tag-btn {
+      display: inline-block; margin-top: 10px;
+      font-size: 10px; padding: 4px 12px; border-radius: 100px;
+      background: var(--mint); color: var(--navy);
+      border: none; cursor: pointer; font-weight: 700;
+      font-family: 'Space Mono', monospace;
+    }
+
+    /* Playground */
+    .playground {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 16px; overflow: hidden; margin-bottom: 48px;
+    }
+    .playground-header {
+      background: #0d1b2e; padding: 14px 20px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+    }
+    .pg-title { font-family: 'Space Mono', monospace; font-size: 12px; color: var(--cyan); display: flex; align-items: center; gap: 8px; }
+    .run-btn {
+      background: var(--green); color: #fff;
+      border: none; border-radius: 8px;
+      padding: 8px 20px; font-size: 13px; font-weight: 700;
+      cursor: pointer; font-family: 'Sora', sans-serif;
+      transition: background .2s;
+    }
+    .run-btn:hover { background: #059669; }
+    .playground-body {
+      display: grid; grid-template-columns: 1fr 1fr; min-height: 420px;
+    }
+    @media(max-width: 700px) { .playground-body { grid-template-columns: 1fr; } }
+    .pg-editor { border-right: 1px solid var(--border); display: flex; flex-direction: column; }
+    @media(max-width: 700px) { .pg-editor { border-right: none; border-bottom: 1px solid var(--border); } }
+    .pg-editor-tabs {
+      display: flex; border-bottom: 1px solid var(--border); background: #0d1b2e;
+    }
+    .pg-tab {
+      padding: 10px 18px; font-family: 'Space Mono', monospace; font-size: 11px;
+      color: var(--muted); cursor: pointer; border: none; background: none;
+      border-bottom: 2px solid transparent;
+    }
+    .pg-tab.active { color: var(--mint); border-bottom-color: var(--mint); }
+    .pg-textarea {
+      flex: 1; background: #0d1b2e; border: none; outline: none;
+      color: #7dd3fc; font-family: 'Space Mono', monospace;
+      font-size: 12.5px; line-height: 1.8;
+      padding: 20px; resize: none; width: 100%; min-height: 380px;
+    }
+    .pg-result-label {
+      padding: 10px 18px;
+      font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted);
+      border-bottom: 1px solid var(--border); background: var(--dark);
+    }
+    .pg-iframe { flex: 1; border: none; background: #fff; min-height: 380px; width: 100%; }
+
+    /* Examples */
+    .examples-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px; margin-bottom: 48px;
+    }
+    .ex-card {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 14px; overflow: hidden; cursor: pointer;
+      transition: border-color .2s, transform .2s;
+    }
+    .ex-card:hover { border-color: var(--mint); transform: translateY(-3px); }
+    .ex-card.active { border-color: var(--mint); box-shadow: 0 0 0 2px rgba(45,212,191,.2); }
+    .ex-card-head {
+      padding: 16px 18px 12px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ex-card-head h3 { font-size: .95rem; font-weight: 700; }
+    .use-btn {
+      font-size: 11px; padding: 4px 12px; border-radius: 100px;
+      background: var(--mint); color: #0f172a;
+      border: none; cursor: pointer; font-weight: 700;
+      font-family: 'Space Mono', monospace;
+    }
+    .use-btn:hover { opacity: .9; }
+    .ex-code {
+      background: #0d1b2e; padding: 14px 18px;
+      font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.7;
+      color: #7dd3fc; white-space: pre; overflow-x: auto;
+    }
+    .ex-desc { padding: 12px 18px 16px; font-size: .8rem; color: var(--muted); }
+
+    /* Quiz */
+    .quiz-section {
+      background: var(--dark); border: 1px solid var(--border);
+      border-radius: 16px; padding: 28px; margin-bottom: 44px;
+    }
+    .quiz-section h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 20px; }
+    .quiz-item { margin-bottom: 24px; }
+    .quiz-item p { font-size: .9rem; font-weight: 600; margin-bottom: 12px; }
+    .quiz-options { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quiz-opt {
+      padding: 8px 18px; border-radius: 8px;
+      background: #0d1b2e; border: 1px solid var(--border);
+      cursor: pointer; font-size: .85rem; color: var(--white);
+      font-family: 'Space Mono', monospace;
+      transition: border-color .2s;
+    }
+    .quiz-opt:hover { border-color: var(--mint); }
+    .quiz-opt.correct { background: rgba(16,185,129,.2); border-color: var(--green); color: var(--green); }
+    .quiz-opt.wrong   { background: rgba(239,68,68,.15); border-color: var(--red); color: var(--red); }
+    .quiz-feedback { font-size: .8rem; margin-top: 8px; min-height: 18px; }
+    .quiz-feedback.ok  { color: var(--green); }
+    .quiz-feedback.err { color: var(--red); }
+
+    /* Exercise */
+    .exercise-section {
+      background: linear-gradient(145deg, #0c1f24 0%, #141832 100%);
+      border: 1px solid rgba(45,212,191,.25);
+      border-radius: 16px; padding: 32px; margin-bottom: 56px;
+    }
+    .exercise-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--mint-dim); color: var(--mint);
+      border: 1px solid rgba(45,212,191,.35);
+      border-radius: 100px; padding: 6px 16px;
+      font-family: 'Space Mono', monospace; font-size: 11px;
+      font-weight: 700; letter-spacing: 1px; margin-bottom: 18px;
+    }
+    .exercise-section h2 { font-size: 1.3rem; font-weight: 700; margin-bottom: 8px; }
+    .exercise-section > p { color: var(--muted); font-size: .9rem; line-height: 1.7; margin-bottom: 24px; }
+    .task-list { list-style: none; margin-bottom: 28px; }
+    .task-list li {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(45,212,191,.1);
+      font-size: .9rem;
+    }
+    .task-list li:last-child { border-bottom: none; }
+    .task-num {
+      flex-shrink: 0; width: 26px; height: 26px; border-radius: 50%;
+      background: rgba(45,212,191,.2); color: var(--mint);
+      font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .answer-toggle {
+      background: rgba(45,212,191,.08); border: 1px solid rgba(45,212,191,.25);
+      border-radius: 10px; padding: 14px 18px; cursor: pointer;
+      font-size: .9rem; color: var(--mint); font-weight: 600;
+      width: 100%; text-align: left;
+    }
+    .answer-body {
+      background: #0d1b2e; border: 1px solid rgba(45,212,191,.15);
+      border-top: none; border-radius: 0 0 10px 10px;
+      padding: 18px; display: none;
+    }
+    .answer-body.open { display: block; }
+    .answer-body pre { font-family: 'Space Mono', monospace; font-size: 12px; color: #7dd3fc; line-height: 1.7; }
+
+    .footer-nav {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 32px 0 48px; border-top: 1px solid var(--border);
+      flex-wrap: wrap; gap: 16px;
+    }
+    .nav-btn {
+      text-decoration: none; padding: 12px 24px;
+      border-radius: 10px; font-size: .9rem; font-weight: 600;
+      display: flex; align-items: center; gap: 8px; transition: transform .2s;
+    }
+    .nav-btn:hover { transform: translateY(-2px); }
+    .nav-prev { background: var(--dark); border: 1px solid var(--border); color: var(--muted); }
+    .nav-next { background: var(--blue); color: #fff; }
+    .nav-muted {
+      padding: 12px 20px; border-radius: 10px;
+      border: 1px dashed var(--border); color: var(--muted);
+      font-size: .85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="index.html" class="back-btn">← Voltar</a>
+      <span class="topbar-pill">AULA 03</span>
+    </div>
+    <div class="topbar-right">links-e-imagens.html</div>
+  </div>
+
+  <div class="wrap">
+
+    <div class="page-header">
+      <div class="lesson-tag">▸ Aula 03 de 05</div>
+      <h1>🔗 Links e Imagens</h1>
+      <p>
+        O HTML conecta o mundo: <strong>hiperlinks</strong> levam o usuário a outras páginas ou trechos,
+        e imagens contam histórias sem palavras. Explore a anatomia das tags, monte links ao vivo e experimente no playground.
+      </p>
+    </div>
+
+    <div class="sec-title">▸ anatomia clicável</div>
+    <div class="sec-h2">Alterne entre &lt;a&gt; e &lt;img&gt;</div>
+
+    <div class="anatomy-wrap">
+      <div class="anatomy-tabs" role="tablist">
+        <button type="button" class="anatomy-tab active" data-anatomy="a" role="tab" aria-selected="true">Tag &lt;a&gt;</button>
+        <button type="button" class="anatomy-tab" data-anatomy="img" role="tab" aria-selected="false">Tag &lt;img&gt;</button>
+      </div>
+      <div id="anatomy-a" class="anatomy-panel active">
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px;max-width:640px;line-height:1.65;">
+          O elemento âncora precisa de <code style="color:var(--mint)">href</code> (destino). O texto visível fica entre abertura e fechamento — é o que o usuário clica.
+        </p>
+        <div class="anatomy-flow">
+          <div>
+            <div class="anatomy-box" style="padding: 20px 28px;">
+              <div class="ab-open" style="font-size: 18px;">&lt;a href="https://exemplo.org"&gt;</div>
+              <div class="label" style="font-size: 11px;">abertura + destino</div>
+            </div>
+          </div>
+          <span class="anatomy-arrow" style="font-size: 28px;">→</span>
+          <div>
+            <div class="anatomy-box" style="padding: 20px 28px;">
+              <div class="ab-mid" style="font-size: 16px;">Texto do link</div>
+              <div class="label" style="font-size: 11px;">conteúdo clicável</div>
+            </div>
+          </div>
+          <span class="anatomy-arrow" style="font-size: 28px;">→</span>
+          <div>
+            <div class="anatomy-box" style="padding: 20px 28px;">
+              <div class="ab-close" style="font-size: 18px;">&lt;/a&gt;</div>
+              <div class="label" style="font-size: 11px;">fechamento</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="anatomy-img" class="anatomy-panel">
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:20px;max-width:640px;line-height:1.65;">
+          <code style="color:var(--coral)">&lt;img&gt;</code> é uma <strong>tag vazia</strong> (não tem <code style="color:#fda4af">&lt;/img&gt;</code>).
+          Use <code style="color:var(--mint)">src</code> para o arquivo e <code style="color:var(--mint)">alt</code> para descrever a imagem (acessibilidade e SEO).
+        </p>
+        <div class="anatomy-flow">
+          <div class="anatomy-box">
+            <div class="ab-open" style="font-size:16px;white-space:normal;overflow:visible;text-overflow:clip;padding:16px;line-height:1.6;">&lt;img src="foto.jpg" alt="Descrição"&gt;</div>
+            <div class="label">um único bloco — tag completa</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">▸ laboratório ao vivo</div>
+    <div class="sec-h2">Construa um link e uma imagem sem escrever HTML primeiro</div>
+
+    <div class="demo-grid" style="margin-bottom:40px;grid-template-columns:1fr;">
+
+      <!-- QUADRO 1: Construtor de link -->
+      <div class="demo-section" style="border-color:rgba(45,212,191,.35);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="font-size:1.3rem;">🔗</span>
+          <h3 style="margin:0;">Construtor de link</h3>
+          <span style="margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;background:rgba(45,212,191,.12);color:var(--mint);border:1px solid rgba(45,212,191,.3);border-radius:100px;padding:3px 10px;">tag &lt;a&gt;</span>
+        </div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:20px;line-height:1.6;border-left:3px solid var(--mint);padding-left:10px;">
+          Preencha os campos abaixo e veja o código HTML sendo gerado em tempo real. O atributo <code style="color:var(--mint)">href</code> é o destino do link.
+        </p>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:6px;letter-spacing:.5px;">
+          TIPO DE DESTINO — define o formato do <code style="color:var(--mint)">href</code>
+        </label>
+        <div class="demo-controls">
+          <select class="demo-select" id="linkType" aria-label="Tipo de destino">
+            <option value="external">Site (https://)</option>
+            <option value="anchor">Âncora na página (#)</option>
+            <option value="mailto">E-mail (mailto:)</option>
+            <option value="tel">Telefone (tel:)</option>
+          </select>
+        </div>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:6px;letter-spacing:.5px;">
+          DESTINO (<code style="color:var(--mint)">href</code>) — URL, e-mail, telefone ou #ancora
+        </label>
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:6px;letter-spacing:.5px;margin-top:10px;">
+          TEXTO DO LINK — o que o usuário vai ler e clicar
+        </label>
+        <div class="demo-controls">
+          <input class="demo-input" id="linkTarget" type="text" placeholder="URL, #secao, email ou número" value="https://developer.mozilla.org/pt-BR/docs/Web/HTML/Element/a">
+          <input class="demo-input" id="linkLabel" type="text" placeholder="Texto do link" value="Documentação do elemento &lt;a&gt;">
+        </div>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:8px;letter-spacing:.5px;">
+          COMPORTAMENTO — controla onde a página abre
+        </label>
+        <label class="demo-check" style="margin-bottom:14px;">
+          <input type="checkbox" id="linkBlank">
+          <span>Abrir em nova aba (<code style="color:var(--mint)">target="_blank"</code>) e adicionar <code style="color:var(--mint)">rel="noopener noreferrer"</code></span>
+        </label>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:6px;letter-spacing:.5px;">
+          PRÉ-VISUALIZAÇÃO — como aparece no navegador
+        </label>
+        <div class="demo-preview-box" id="linkPreviewBox">
+          <p style="margin:0 0 8px;font-size:.85rem;color:#64748b;">Pré-visualização:</p>
+          <div id="linkPreviewMount"></div>
+        </div>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin:10px 0 4px;letter-spacing:.5px;">
+          CÓDIGO GERADO — copie e use no seu HTML
+        </label>
+        <div class="code-strip" id="linkCodeOut" aria-live="polite"></div>
+      </div>
+
+      <!-- QUADRO 2: Laboratório de imagem -->
+      <div class="demo-section" style="border-color:rgba(251,146,60,.35);">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+          <span style="font-size:1.3rem;">🖼️</span>
+          <h3 style="margin:0;">Laboratório de imagem</h3>
+          <span style="margin-left:auto;font-family:'Space Mono',monospace;font-size:10px;background:rgba(251,146,60,.12);color:#fb923c;border:1px solid rgba(251,146,60,.3);border-radius:100px;padding:3px 10px;">tag &lt;img&gt;</span>
+        </div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:20px;line-height:1.6;border-left:3px solid #fb923c;padding-left:10px;">
+          A tag <code style="color:var(--coral)">&lt;img&gt;</code> não tem fechamento. Os atributos <code style="color:var(--mint)">src</code> (caminho) e <code style="color:var(--mint)">alt</code> (descrição) são obrigatórios.
+        </p>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:6px;letter-spacing:.5px;">
+          IMAGEM (<code style="color:var(--mint)">src</code>) — escolha uma foto de exemplo
+        </label>
+        <div class="demo-controls">
+          <select class="demo-select" id="imgPreset" aria-label="Preset de imagem">
+            <option value="https://picsum.photos/seed/htmlweb/420/240">Paisagem — código &amp; natureza</option>
+            <option value="https://picsum.photos/seed/pixelart/420/240">Estilo block / cidade</option>
+            <option value="https://picsum.photos/seed/abstract/420/240">Formas abstratas</option>
+          </select>
+        </div>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:6px;letter-spacing:.5px;">
+          TEXTO ALTERNATIVO (<code style="color:var(--mint)">alt</code>) — descritivo para acessibilidade e SEO
+        </label>
+        <div class="demo-controls">
+          <input class="demo-input" id="imgAlt" type="text" placeholder="Texto alternativo (alt)" value="Ilustração representando aprendizado em desenvolvimento web">
+        </div>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin-bottom:6px;letter-spacing:.5px;">
+          LARGURA (<code style="color:var(--mint)">width</code>) — tamanho em pixels
+        </label>
+        <div class="range-row">
+          <span style="font-size:.8rem;color:var(--muted);white-space:nowrap;">Largura</span>
+          <input type="range" id="imgWidth" min="120" max="400" value="280" aria-label="Largura da imagem">
+          <span id="imgWidthVal" style="font-family:'Space Mono',monospace;font-size:12px;color:var(--mint);min-width:42px;">280px</span>
+        </div>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin:12px 0 6px;letter-spacing:.5px;">
+          TESTE DE ERRO — simula quando o <code style="color:var(--mint)">src</code> é inválido
+        </label>
+        <label class="demo-check" style="margin-top:4px;">
+          <input type="checkbox" id="imgBroken">
+          <span>Simular URL inválida (ver ícone de imagem quebrada)</span>
+        </label>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin:14px 0 6px;letter-spacing:.5px;">
+          PRÉ-VISUALIZAÇÃO — como aparece no navegador
+        </label>
+        <div class="demo-preview-box" style="margin-top:0;">
+          <p style="margin:0 0 8px;font-size:.85rem;color:#64748b;">Pré-visualização:</p>
+          <div id="imgPreviewMount"></div>
+        </div>
+
+        <label style="display:block;font-size:.75rem;color:var(--cyan);font-family:'Space Mono',monospace;margin:10px 0 4px;letter-spacing:.5px;">
+          CÓDIGO GERADO — copie e use no seu HTML
+        </label>
+        <div class="code-strip" id="imgCodeOut" aria-live="polite"></div>
+      </div>
+
+    </div>
+
+    <div class="sec-title">▸ mapa de destinos</div>
+    <div class="sec-h2">Um clique carrega o exemplo no playground</div>
+
+    <div class="dest-grid">
+      <div class="dest-card" data-dest="externo">
+        <div class="dest-icon">🌐</div>
+        <h4>Hiperlink externo</h4>
+        <p>Aponta para outro site com URL absoluta.</p>
+        <div class="dest-hint">href="https://…"</div>
+      </div>
+      <div class="dest-card" data-dest="interno">
+        <div class="dest-icon">📄</div>
+        <h4>Arquivo no mesmo site</h4>
+        <p>Caminho relativo entre páginas do seu projeto.</p>
+        <div class="dest-hint">href="contato.html"</div>
+      </div>
+      <div class="dest-card" data-dest="ancora">
+        <div class="dest-icon">⚓</div>
+        <h4>Salto na mesma página</h4>
+        <p>Combine <code style="color:var(--mint)">id</code> no destino e <code style="color:var(--mint)">#</code> no link.</p>
+        <div class="dest-hint">href="#secao"</div>
+      </div>
+      <div class="dest-card" data-dest="mailto">
+        <div class="dest-icon">✉️</div>
+        <h4>Abrir cliente de e-mail</h4>
+        <p>O navegador sugere enviar mensagem para o endereço.</p>
+        <div class="dest-hint">mailto:nome@…</div>
+      </div>
+      <div class="dest-card" data-dest="download">
+        <div class="dest-icon">⬇️</div>
+        <h4>Download sugerido</h4>
+        <p>Atributo <code style="color:var(--mint)">download</code> em arquivos do mesmo domínio.</p>
+        <div class="dest-hint">download="nome.ext"</div>
+      </div>
+    </div>
+
+    <div class="sec-title">▸ receitas prontas</div>
+    <div class="sec-h2">Cards que enviam snippets para o editor</div>
+
+    <div class="tags-grid">
+      <div class="tag-card" data-tag="a_basico">
+        <div class="tag-code" style="color:#5eead4">&lt;a&gt; básico</div>
+        <p>Link simples para uma URL. O texto convida ao clique.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="a_blank">
+        <div class="tag-code" style="color:#fcd34d">Nova aba + rel</div>
+        <p>Boas práticas ao usar <code style="color:var(--muted)">target="_blank"</code>.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="img_basico">
+        <div class="tag-code" style="color:#fb923c">&lt;img&gt;</div>
+        <p><code style="color:var(--muted)">src</code> + <code style="color:var(--muted)">alt</code> obrigatório para acessibilidade.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="img_lazy">
+        <div class="tag-code" style="color:#a5b4fc">loading="lazy"</div>
+        <p>Carrega a imagem quando o usuário se aproxima da área visível.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="a_title">
+        <div class="tag-code" style="color:#f472b6">title no link</div>
+        <p>Dica extra ao passar o mouse — não substitui um bom texto de link.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+      <div class="tag-card" data-tag="figure">
+        <div class="tag-code" style="color:#86efac">&lt;figure&gt; + &lt;figcaption&gt;</div>
+        <p>Agrupa imagem com legenda semântica.</p>
+        <button type="button" class="load-tag-btn">Testar no playground</button>
+      </div>
+    </div>
+
+    <div class="sec-title">▸ playground interativo</div>
+    <div class="sec-h2">Edite, execute e veja links e imagens no iframe</div>
+
+    <div class="playground">
+      <div class="playground-header">
+        <div class="pg-title"><span>⚡</span><span>Editor ao vivo</span></div>
+        <button class="run-btn" type="button" id="runPlayground">▶ Executar</button>
+      </div>
+      <div class="playground-body">
+        <div class="pg-editor">
+          <div class="pg-editor-tabs">
+            <button type="button" class="pg-tab active">HTML</button>
+          </div>
+          <textarea class="pg-textarea" id="htmlEditor" spellcheck="false"><h1>Galeria rápida</h1>
+<p>Visite a <a href="https://developer.mozilla.org/pt-BR/">MDN em português</a> para aprofundar.</p>
+
+<h2 id="fotos">Fotos</h2>
+<p>
+  <a href="https://example.com" target="_blank" rel="noopener noreferrer">Site de exemplo (nova aba)</a>
+</p>
+
+<img src="https://picsum.photos/seed/aula03/360/200" alt="Foto de paisagem gerada aleatoriamente" width="320" loading="lazy">
+
+<p><a href="#fotos">↑ Voltar ao título Fotos</a></p></textarea>
+        </div>
+        <div class="pg-result">
+          <div class="pg-result-label">⬛ Resultado</div>
+          <iframe class="pg-iframe" id="preview" title="Resultado do HTML"></iframe>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec-title">▸ exemplos completos</div>
+    <div class="sec-h2">Clique no card ou em “Usar”</div>
+
+    <div class="examples-grid">
+      <div class="ex-card" data-example="0">
+        <div class="ex-card-head">
+          <h3>📇 Mini perfil</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;h1&gt;Ana Dev&lt;/h1&gt;
+&lt;p&gt;
+  &lt;a href="https://github.com"&gt;Meu GitHub&lt;/a&gt;
+&lt;/p&gt;
+&lt;img src="https://picsum.photos/seed/profile/200/200"
+     alt="Retrato em estilo avatar"
+     width="120"&gt;</div>
+        <div class="ex-desc">Link externo + imagem quadrada com alt descritivo.</div>
+      </div>
+      <div class="ex-card" data-example="1">
+        <div class="ex-card-head">
+          <h3>🧭 Navegação interna</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;p&gt;
+  &lt;a href="#contato"&gt;Ir para contato&lt;/a&gt;
+&lt;/p&gt;
+&lt;h2 id="sobre"&gt;Sobre&lt;/h2&gt;
+&lt;p&gt;Texto da seção sobre.&lt;/p&gt;
+&lt;h2 id="contato"&gt;Contato&lt;/h2&gt;
+&lt;p&gt;email@exemplo.com&lt;/p&gt;</div>
+        <div class="ex-desc">Âncoras <code>id</code> + links <code>#</code> na mesma página.</div>
+      </div>
+      <div class="ex-card" data-example="2">
+        <div class="ex-card-head">
+          <h3>✉️ Contato direto</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;p&gt;
+  &lt;a href="mailto:prof@escola.edu.br?subject=HTML"&gt;
+    Enviar e-mail ao professor
+  &lt;/a&gt;
+&lt;/p&gt;
+&lt;p&gt;
+  &lt;a href="tel:+5521999999999"&gt;Ligar (exemplo)&lt;/a&gt;
+&lt;/p&gt;</div>
+        <div class="ex-desc"><code>mailto</code> com assunto opcional e link telefônico.</div>
+      </div>
+      <div class="ex-card" data-example="3">
+        <div class="ex-card-head">
+          <h3>🖼️ Figura com legenda</h3>
+          <button class="use-btn" type="button">Usar</button>
+        </div>
+        <div class="ex-code">&lt;figure&gt;
+  &lt;img src="https://picsum.photos/seed/caption/400/220"
+       alt="Cena urbana ao entardecer"&gt;
+  &lt;figcaption&gt;
+    Foto ilustrativa — substitua pelo seu projeto.
+  &lt;/figcaption&gt;
+&lt;/figure&gt;</div>
+        <div class="ex-desc">Semântica HTML5 para imagem + texto de apoio.</div>
+      </div>
+    </div>
+
+    <div class="sec-title">▸ teste rápido</div>
+    <div class="sec-h2">Mini quiz — 3 perguntas</div>
+
+    <div class="quiz-section">
+      <h3>🧠 Fixação</h3>
+
+      <div class="quiz-item">
+        <p>1. Qual atributo da tag <code style="color:var(--mint)">&lt;a&gt;</code> define o destino do clique?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">src</button>
+          <button class="quiz-opt" type="button" data-correct="true">href</button>
+          <button class="quiz-opt" type="button" data-correct="false">alt</button>
+          <button class="quiz-opt" type="button" data-correct="false">link</button>
+        </div>
+        <div class="quiz-feedback" id="qf0"></div>
+      </div>
+
+      <div class="quiz-item">
+        <p>2. A tag <code style="color:var(--coral)">&lt;img&gt;</code> possui tag de fechamento <code style="color:#fda4af">&lt;/img&gt;</code>?</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="true">Não — é elemento vazio</button>
+          <button class="quiz-opt" type="button" data-correct="false">Sim, sempre</button>
+          <button class="quiz-opt" type="button" data-correct="false">Só se tiver atributo alt</button>
+        </div>
+        <div class="quiz-feedback" id="qf1"></div>
+      </div>
+
+      <div class="quiz-item">
+        <p>3. Abrir link em nova aba com segurança costuma combinar:</p>
+        <div class="quiz-options">
+          <button class="quiz-opt" type="button" data-correct="false">target="_self" rel="nofollow"</button>
+          <button class="quiz-opt" type="button" data-correct="true">target="_blank" rel="noopener noreferrer"</button>
+          <button class="quiz-opt" type="button" data-correct="false">href="_blank"</button>
+        </div>
+        <div class="quiz-feedback" id="qf2"></div>
+      </div>
+    </div>
+
+    <div class="exercise-section">
+      <div class="exercise-badge">✏️ EXERCÍCIO 03</div>
+      <h2>Página “Portfólio em uma tela”</h2>
+      <p>No playground, monte um HTML que use pelo menos um link externo, um link interno (#), uma imagem com alt e um parágrafo.</p>
+
+      <ul class="task-list">
+        <li>
+          <span class="task-num">1</span>
+          <div><strong>Título</strong> — <code style="color:var(--mint)">&lt;h1&gt;</code> com seu nome ou apelido criativo.</div>
+        </li>
+        <li>
+          <span class="task-num">2</span>
+          <div><strong>Link externo</strong> — site que você recomenda (documentação, blog, etc.).</div>
+        </li>
+        <li>
+          <span class="task-num">3</span>
+          <div><strong>Imagem</strong> — use <code style="color:var(--mint)">&lt;img&gt;</code> com <code style="color:var(--mint)">src</code> (URL válida) e <code style="color:var(--mint)">alt</code> que descreva a imagem.</div>
+        </li>
+        <li>
+          <span class="task-num">4</span>
+          <div><strong>Âncora</strong> — um <code style="color:var(--mint)">id</code> em um subtítulo e um link <code style="color:var(--mint)">href="#…"</code> apontando para ele.</div>
+        </li>
+      </ul>
+
+      <button class="answer-toggle" type="button">💡 Ver exemplo de resposta</button>
+      <div class="answer-body" id="answerBody">
+        <pre>&lt;h1&gt;Portfólio da Lu&lt;/h1&gt;
+
+&lt;p&gt;
+  Documentação que uso todo dia:
+  &lt;a href="https://developer.mozilla.org/pt-BR/" target="_blank"
+     rel="noopener noreferrer"&gt;MDN Web Docs&lt;/a&gt;.
+&lt;/p&gt;
+
+&lt;p&gt;
+  &lt;a href="#projetos"&gt;Pular para projetos&lt;/a&gt;
+&lt;/p&gt;
+
+&lt;img src="https://picsum.photos/seed/portfolio/400/220"
+     alt="Composição abstrata em tons de azul"
+     width="320" loading="lazy"&gt;
+
+&lt;h2 id="projetos"&gt;Projetos&lt;/h2&gt;
+&lt;p&gt;Meu primeiro site em HTML puro.&lt;/p&gt;</pre>
+      </div>
+    </div>
+
+    <div class="footer-nav">
+      <a href="estrutura-basica.html" class="nav-btn nav-prev">← Aula anterior: Estrutura Básica</a>
+      <div style="display:flex;flex-wrap:wrap;gap:12px;align-items:center;">
+        <span class="nav-muted">Aula 04 · Formulários — em breve</span>
+         <a href="formulario.html" class="nav-btn nav-next">Ver todas as aulas →</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    const examples = [
+      `<h1>Ana Dev</h1>\n<p>\n  <a href="https://github.com">Meu GitHub</a>\n</p>\n<img src="https://picsum.photos/seed/profile/200/200"\n     alt="Retrato em estilo avatar"\n     width="120">`,
+      `<p>\n  <a href="#contato">Ir para contato</a>\n</p>\n<h2 id="sobre">Sobre</h2>\n<p>Texto da seção sobre.</p>\n<h2 id="contato">Contato</h2>\n<p>email@exemplo.com</p>`,
+      `<p>\n  <a href="mailto:prof@escola.edu.br?subject=HTML">\n    Enviar e-mail ao professor\n  </a>\n</p>\n<p>\n  <a href="tel:+5521999999999">Ligar (exemplo)</a>\n</p>`,
+      `<figure>\n  <img src="https://picsum.photos/seed/caption/400/220"\n       alt="Cena urbana ao entardecer">\n  <figcaption>\n    Foto ilustrativa — substitua pelo seu projeto.\n  </figcaption>\n</figure>`
+    ];
+
+    const destExamples = {
+      externo: `<h1>Link externo</h1>\n<p>Abre outro site no mesmo navegador:</p>\n<p><a href="https://www.w3.org/">Consórcio W3C</a></p>`,
+      interno: `<h1>Links relativos</h1>\n<p>Apontam para arquivos na mesma pasta do projeto:</p>\n<ul>\n  <li><a href="index.html">Página inicial</a></li>\n  <li><a href="titulos-e-textos.html">Aula títulos e textos</a></li>\n</ul>`,
+      ancora: `<h1>Sumário</h1>\n<p><a href="#parte2">Ir para a parte 2</a></p>\n<h2 id="parte1">Parte 1</h2>\n<p>Conteúdo inicial…</p>\n<h2 id="parte2">Parte 2</h2>\n<p>Você chegou aqui pelo link interno!</p>`,
+      mailto: `<h1>Fale comigo</h1>\n<p><a href="mailto:contato@exemplo.org?subject=Dúvida%20HTML">Enviar e-mail</a></p>`,
+      download: `<h1>Arquivo para baixar</h1>\n<p>O atributo <code>download</code> sugere salvar o recurso (funciona para mesma origem ou blobs):</p>\n<p><a href="https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf" download="exemplo-leitura.pdf">Baixar PDF de teste</a></p>\n<p><small>Em alguns navegadores PDF pode abrir em aba; o importante é conhecer o atributo.</small></p>`
+    };
+
+    const tagExamples = {
+      a_basico: `<p>Leia mais sobre HTML no\n<a href="https://developer.mozilla.org/pt-BR/docs/Web/HTML">MDN</a>.</p>`,
+      a_blank: `<p>\n  <a href="https://example.com" target="_blank" rel="noopener noreferrer">\n    Example.com (abre em nova aba)\n  </a>\n</p>`,
+      img_basico: `<h1>Logo</h1>\n<img src="https://picsum.photos/seed/logo/280/120"\n     alt="Faixa colorida simulando um logo">`,
+      img_lazy: `<p>Imagens abaixo carregam sob demanda (<code>loading="lazy"</code>):</p>\n<img src="https://picsum.photos/seed/lazy1/320/180" alt="Cena 1" loading="lazy">\n<img src="https://picsum.photos/seed/lazy2/320/180" alt="Cena 2" loading="lazy">`,
+      a_title: `<p>\n  <a href="https://html.spec.whatwg.org/" title="Especificação viva do HTML (inglês)">\n    O que é o WHATWG?\n  </a>\n</p>`,
+      figure: `<figure>\n  <img src="https://picsum.photos/seed/fig/380/200" alt="Horizonte com nuvens">\n  <figcaption>Legenda: horizonte ilustrativo.</figcaption>\n</figure>`
+    };
+
+    function loadExample(i) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || examples[i] === undefined) return;
+      ed.value = examples[i];
+      document.querySelectorAll('.ex-card').forEach(function (c, j) { c.classList.toggle('active', i === j); });
+      runCode();
+      scrollToPreview();
+    }
+
+    function loadDest(key) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || !destExamples[key]) return;
+      ed.value = destExamples[key];
+      document.querySelectorAll('.ex-card').forEach(function (c) { c.classList.remove('active'); });
+      runCode();
+      scrollToPreview();
+    }
+
+    function loadTag(tag) {
+      var ed = document.getElementById('htmlEditor');
+      if (!ed || !tagExamples[tag]) return;
+      ed.value = tagExamples[tag];
+      runCode();
+      scrollToPreview();
+    }
+
+    function scrollToPreview() {
+      var pv = document.getElementById('preview');
+      if (pv) pv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    function normalizeEditorHtml(html) {
+      const hasEncodedTags = /&lt;|&gt;|&amp;/i.test(html);
+      if (!hasEncodedTags) return html;
+      const textarea = document.createElement('textarea');
+      textarea.innerHTML = html;
+      return textarea.value;
+    }
+
+    function runCode() {
+      const editor = document.getElementById('htmlEditor');
+      const iframe = document.getElementById('preview');
+      if (!editor || !iframe) return;
+      const html = normalizeEditorHtml(editor.value);
+      const isFullDocument = /<!doctype\s+html|<html[\s>]/i.test(html);
+      if (isFullDocument) {
+        iframe.srcdoc = html;
+        return;
+      }
+      iframe.srcdoc = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><style>body{font-family:system-ui,sans-serif;padding:16px;line-height:1.65;color:#1e293b}a{color:#0d9488;font-weight:600}img{max-width:100%;height:auto;border-radius:8px}code{background:#f1f5f9;padding:2px 6px;border-radius:4px;font-size:.9em}</style></head><body>' + html + '</body></html>';
+    }
+
+    function escapeAttr(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function escapeHtml(s) {
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+    }
+
+    function buildHrefFromForm() {
+      const type = document.getElementById('linkType').value;
+      let raw = document.getElementById('linkTarget').value.trim();
+      if (/^javascript:/i.test(raw)) raw = '#seguro';
+
+      if (type === 'anchor') {
+        if (!raw.startsWith('#')) raw = '#' + raw.replace(/^#+/, '');
+        return raw;
+      }
+      if (type === 'mailto') {
+        if (!raw.startsWith('mailto:')) raw = 'mailto:' + raw.replace(/^mailto:/i, '');
+        return raw;
+      }
+      if (type === 'tel') {
+        if (/^tel:/i.test(raw)) return raw;
+        const digits = raw.replace(/\D/g, '');
+        if (!digits) return '#';
+        return 'tel:+' + digits.replace(/^\+/, '');
+      }
+      if (!/^https?:\/\//i.test(raw) && raw.length) {
+        return 'https://' + raw.replace(/^\/+/, '');
+      }
+      return raw || '#';
+    }
+
+    function updateLinkDemo() {
+      const labelInput = document.getElementById('linkLabel');
+      const blank = document.getElementById('linkBlank').checked;
+      const mount = document.getElementById('linkPreviewMount');
+      const codeOut = document.getElementById('linkCodeOut');
+      if (!labelInput || !mount || !codeOut) return;
+
+      const href = buildHrefFromForm();
+      const labelText = labelInput.value || 'Texto do link';
+      const safeHref = escapeAttr(href);
+
+      while (mount.firstChild) mount.removeChild(mount.firstChild);
+      const a = document.createElement('a');
+      a.href = href;
+      a.textContent = labelText.replace(/<[^>]*>/g, '');
+      if (blank) {
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+      }
+      mount.appendChild(a);
+
+      let code = '<a href="' + safeHref + '"';
+      if (blank) code += ' target="_blank" rel="noopener noreferrer"';
+      code += '>' + escapeHtml(labelText) + '</a>';
+      codeOut.textContent = code;
+    }
+
+    function updateImgDemo() {
+      const preset = document.getElementById('imgPreset');
+      const altInput = document.getElementById('imgAlt');
+      const widthRange = document.getElementById('imgWidth');
+      const broken = document.getElementById('imgBroken').checked;
+      const mount = document.getElementById('imgPreviewMount');
+      const codeOut = document.getElementById('imgCodeOut');
+      const wVal = document.getElementById('imgWidthVal');
+      if (!preset || !altInput || !widthRange || !mount || !codeOut) return;
+
+      const w = widthRange.value;
+      if (wVal) wVal.textContent = w + 'px';
+
+      let src = preset.value;
+      if (broken) src = 'https://url-invalida-que-nao-existe.example/404.jpg';
+
+      while (mount.firstChild) mount.removeChild(mount.firstChild);
+      const img = document.createElement('img');
+      img.src = src;
+      img.alt = altInput.value || 'descrição da imagem';
+      img.width = parseInt(w, 10);
+      img.style.height = 'auto';
+      mount.appendChild(img);
+
+      const safeSrc = escapeAttr(src);
+      const safeAlt = escapeAttr(img.alt);
+      codeOut.textContent = '<img src="' + safeSrc + '" alt="' + safeAlt + '" width="' + w + '">';
+    }
+
+    function checkQuiz(btn, correct) {
+      if (!btn || !btn.closest) return;
+      const parent = btn.closest('.quiz-item');
+      if (!parent) return;
+      parent.querySelectorAll('.quiz-opt').forEach(function (o) { o.style.pointerEvents = 'none'; });
+      btn.classList.add(correct ? 'correct' : 'wrong');
+      const fb = parent.querySelector('.quiz-feedback');
+      if (fb) {
+        fb.textContent = correct ? '✅ Correto!' : '❌ Revise o conteúdo da aula e tente de novo.';
+        fb.className = 'quiz-feedback ' + (correct ? 'ok' : 'err');
+      }
+    }
+
+    function toggleAnswer() {
+      const body = document.getElementById('answerBody');
+      if (body) body.classList.toggle('open');
+    }
+
+    function setAnatomy(which) {
+      document.querySelectorAll('.anatomy-tab').forEach(function (t) {
+        const on = t.getAttribute('data-anatomy') === which;
+        t.classList.toggle('active', on);
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      document.querySelectorAll('.anatomy-panel').forEach(function (p) {
+        p.classList.toggle('active', p.id === 'anatomy-' + which);
+      });
+    }
+
+    function initLinksPage() {
+      const wrap = document.querySelector('.wrap');
+      if (!wrap) return;
+
+      wrap.addEventListener('click', function (e) {
+        var t = e.target;
+        if (t && t.nodeType !== 1) t = t.parentElement;
+        if (!t || typeof t.closest !== 'function') return;
+
+        var tab = t.closest('.anatomy-tab[data-anatomy]');
+        if (tab && wrap.contains(tab)) {
+          e.preventDefault();
+          setAnatomy(tab.getAttribute('data-anatomy'));
+          return;
+        }
+
+        if (t.closest('#runPlayground')) {
+          e.preventDefault();
+          runCode();
+          return;
+        }
+
+        var quizOpt = t.closest('.quiz-opt');
+        if (quizOpt && wrap.contains(quizOpt)) {
+          e.preventDefault();
+          checkQuiz(quizOpt, quizOpt.getAttribute('data-correct') === 'true');
+          return;
+        }
+
+        if (t.closest('.answer-toggle')) {
+          e.preventDefault();
+          toggleAnswer();
+          return;
+        }
+
+        var useBtn = t.closest('.use-btn');
+        if (useBtn && wrap.contains(useBtn)) {
+          e.preventDefault();
+          var exFromBtn = useBtn.closest('.ex-card[data-example]');
+          if (exFromBtn) {
+            var idxBtn = parseInt(exFromBtn.getAttribute('data-example'), 10);
+            if (!Number.isNaN(idxBtn)) loadExample(idxBtn);
+          }
+          return;
+        }
+
+        var dest = t.closest('.dest-card[data-dest]');
+        if (dest && wrap.contains(dest)) {
+          e.preventDefault();
+          loadDest(dest.getAttribute('data-dest'));
+          return;
+        }
+
+        var tagCard = t.closest('.tag-card[data-tag]');
+        if (tagCard && wrap.contains(tagCard)) {
+          var tg = tagCard.getAttribute('data-tag');
+          if (tg) loadTag(tg);
+          return;
+        }
+
+        var exCard = t.closest('.ex-card[data-example]');
+        if (exCard && wrap.contains(exCard)) {
+          var i = parseInt(exCard.getAttribute('data-example'), 10);
+          if (!Number.isNaN(i)) loadExample(i);
+        }
+      });
+
+      ['linkType', 'linkTarget', 'linkLabel', 'linkBlank', 'imgPreset', 'imgAlt', 'imgWidth', 'imgBroken'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (!el) return;
+        el.addEventListener('input', function () {
+          if (id.indexOf('link') === 0) updateLinkDemo();
+          else updateImgDemo();
+        });
+        el.addEventListener('change', function () {
+          if (id.indexOf('link') === 0) updateLinkDemo();
+          else updateImgDemo();
+        });
+      });
+
+      var htmlEditor = document.getElementById('htmlEditor');
+      var timer;
+      if (htmlEditor) {
+        htmlEditor.addEventListener('input', function () {
+          clearTimeout(timer);
+          timer = setTimeout(runCode, 500);
+        });
+      }
+
+      updateLinkDemo();
+      updateImgDemo();
+      runCode();
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initLinksPage);
+    } else {
+      initLinksPage();
+    }
+  </script>
+</body>
+</html>

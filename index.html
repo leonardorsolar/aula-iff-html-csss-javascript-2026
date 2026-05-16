@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aprenda HTML do Zero</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:   #0f172a;
+      --dark:   #1e293b;
+      --panel:  #1a2744;
+      --blue:   #3b82f6;
+      --cyan:   #06b6d4;
+      --amber:  #f59e0b;
+      --green:  #10b981;
+      --red:    #ef4444;
+      --white:  #f8fafc;
+      --muted:  #94a3b8;
+      --border: #334155;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Sora', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── GRID BACKGROUND ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .wrap { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+
+    /* ── HEADER ── */
+    header {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(59,130,246,.15);
+      border: 1px solid rgba(59,130,246,.4);
+      color: var(--cyan);
+      font-family: 'Space Mono', monospace;
+      font-size: 12px;
+      letter-spacing: 2px;
+      padding: 6px 18px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+    }
+
+    header h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .grad { background: linear-gradient(135deg, #60a5fa, #06b6d4); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+    header p {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      line-height: 1.7;
+    }
+
+    /* ── TECH STRIP ── */
+    .tech-strip {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 70px;
+    }
+
+    .tech-pill {
+      font-family: 'Space Mono', monospace;
+      font-size: 13px;
+      padding: 8px 20px;
+      border-radius: 100px;
+      border: 1px solid;
+      font-weight: 700;
+    }
+    .tech-pill.html { color: #fb923c; border-color: rgba(251,146,60,.4); background: rgba(251,146,60,.08); }
+    .tech-pill.css  { color: #818cf8; border-color: rgba(129,140,248,.4); background: rgba(129,140,248,.08); }
+    .tech-pill.js   { color: #fbbf24; border-color: rgba(251,191,36,.4); background: rgba(251,191,36,.08); }
+
+    /* ── SECTION TITLE ── */
+    .section-label {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--cyan);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 40px;
+      color: var(--white);
+    }
+
+    /* ── LESSON CARDS ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 80px;
+    }
+
+    .lesson-card {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      text-decoration: none;
+      color: inherit;
+      display: block;
+      transition: transform .25s, box-shadow .25s, border-color .25s;
+      position: relative;
+    }
+
+    .lesson-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(0,0,0,.5);
+    }
+
+    .lesson-card:hover .card-arrow { transform: translate(4px, -4px); }
+
+    .card-top {
+      padding: 28px 28px 20px;
+      position: relative;
+    }
+
+    .card-number {
+      font-family: 'Space Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    .card-icon {
+      width: 52px; height: 52px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-icon.orange { background: rgba(251,146,60,.15); }
+    .card-icon.purple { background: rgba(139,92,246,.15); }
+    .card-icon.green  { background: rgba(16,185,129,.15); }
+    .card-icon.blue   { background: rgba(59,130,246,.15); }
+    .card-icon.red    { background: rgba(239,68,68,.15); }
+    .card-icon.yellow { background: rgba(251,191,36,.15); }
+
+    .card-top h2 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+
+    .card-top p {
+      font-size: .9rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .card-arrow {
+      position: absolute;
+      top: 28px; right: 28px;
+      font-size: 20px;
+      transition: transform .2s;
+      color: var(--muted);
+    }
+
+    .card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .ctag {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-family: 'Space Mono', monospace;
+    }
+    .ctag.orange { background: rgba(251,146,60,.12); color: #fb923c; }
+    .ctag.cyan   { background: rgba(6,182,212,.12);  color: #06b6d4; }
+    .ctag.green  { background: rgba(16,185,129,.12); color: #10b981; }
+    .ctag.purple { background: rgba(139,92,246,.12); color: #a78bfa; }
+    .ctag.yellow { background: rgba(251,191,36,.12); color: #fbbf24; }
+
+    .card-footer {
+      border-top: 1px solid var(--border);
+      padding: 16px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .card-footer .status {
+      display: flex; align-items: center; gap: 6px;
+    }
+
+    .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .dot.gray { background: var(--border); box-shadow: none; }
+
+    /* ── HOW IT WORKS ── */
+    .how-section { margin-bottom: 80px; }
+
+    .steps-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .step-card {
+      background: var(--dark);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 28px 22px;
+      text-align: center;
+    }
+
+    .step-num {
+      font-family: 'Space Mono', monospace;
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #60a5fa, #06b6d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+      margin-bottom: 12px;
+    }
+
+    .step-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; color: var(--white); }
+    .step-card p  { font-size: .85rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── TIP BOX ── */
+    .tip-box {
+      background: linear-gradient(135deg, rgba(59,130,246,.08), rgba(6,182,212,.08));
+      border: 1px solid rgba(59,130,246,.25);
+      border-radius: 16px;
+      padding: 32px;
+      margin-bottom: 80px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+    }
+
+    @media(max-width:640px){ .tip-box { grid-template-columns: 1fr; } }
+
+    .tip-box h3 { font-size: 1rem; font-weight: 700; margin-bottom: 14px; }
+    .tip-box h3.green { color: var(--green); }
+    .tip-box h3.red   { color: var(--red); }
+
+    .tip-box ul { list-style: none; }
+    .tip-box li { font-size: .9rem; color: var(--muted); margin-bottom: 8px; display: flex; gap: 8px; }
+    .tip-box li::before { flex-shrink: 0; }
+    .tip-do li::before   { content: '✓'; color: var(--green); }
+    .tip-dont li::before { content: '✕'; color: var(--red); }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+      text-align: center;
+      color: var(--muted);
+      font-size: .85rem;
+    }
+
+    footer span { color: var(--cyan); font-family: 'Space Mono', monospace; }
+
+    /* ── GLOW BLOBS ── */
+    .blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(100px);
+      pointer-events: none;
+      z-index: 0;
+      opacity: .35;
+    }
+    .blob1 { width: 500px; height: 500px; background: radial-gradient(circle, #1d4ed8 0%, transparent 70%); top: -150px; left: -100px; }
+    .blob2 { width: 400px; height: 400px; background: radial-gradient(circle, #0891b2 0%, transparent 70%); bottom: 100px; right: -100px; }
+  </style>
+</head>
+<body>
+  <div class="blob blob1"></div>
+  <div class="blob blob2"></div>
+
+  <div class="wrap">
+
+    <!-- HEADER -->
+    <header>
+      <div class="badge">◈ MÓDULO 1 — INTRODUÇÃO AO HTML</div>
+      <h1>Aprenda Web<br><span class="grad">do Zero</span></h1>
+      <p>Playground interativo com exemplos práticos. Escreva código, veja o resultado na hora e aprenda fazendo.</p>
+      <div class="tech-strip">
+        <span class="tech-pill html">&lt;HTML&gt;</span>
+        <span class="tech-pill css">{CSS}</span>
+        <span class="tech-pill js">JS()</span>
+      </div>
+    </header>
+
+    <!-- AULAS -->
+    <div class="section-label">▸ aulas disponíveis</div>
+    <div class="section-title">Escolha uma aula para começar</div>
+
+    <div class="cards-grid">
+
+      <!-- Aula 1 -->
+       <a href="titulos-e-textos.html" class="lesson-card">
+        <div class="card-top">
+          <div class="card-number">AULA 01</div>
+          <div class="card-arrow">↗</div>
+          <div class="card-icon purple">📝</div>
+          <h2>TAGs: Títulos e Textos</h2>
+          <p>Domine as tags de título h1 a h6, parágrafos, negrito, itálico e muito mais.</p>
+          <div class="card-tags">
+            <span class="ctag purple">&lt;h1&gt;…&lt;h6&gt;</span>
+            <span class="ctag cyan">&lt;p&gt;</span>
+            <span class="ctag yellow">&lt;strong&gt;</span>
+            <span class="ctag green">&lt;em&gt;</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="status"><div class="dot"></div> Disponível</div>
+          <span>Playground interativo →</span>
+        </div>
+      </a>
+
+     
+
+      <!-- Aula 2 -->
+      <a href="estrutura-basica.html" class="lesson-card">
+        <div class="card-top">
+          <div class="card-number">AULA 02</div>
+          <div class="card-arrow">↗</div>
+          <div class="card-icon orange">🏠</div>
+          <h2>Estrutura Básica</h2>
+          <p>Aprenda a montar o esqueleto de qualquer página HTML: DOCTYPE, html, head e body.</p>
+          <div class="card-tags">
+            <span class="ctag orange">&lt;!DOCTYPE&gt;</span>
+            <span class="ctag cyan">&lt;html&gt;</span>
+            <span class="ctag green">&lt;head&gt;</span>
+            <span class="ctag purple">&lt;body&gt;</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="status"><div class="dot"></div> Disponível</div>
+          <span>Playground interativo →</span>
+        </div>
+      </a>
+
+      <!-- Aula 3 -->
+      <a href="links-imagens.html" class="lesson-card">
+        <div class="card-top">
+          <div class="card-number">AULA 03</div>
+          <div class="card-arrow">↗</div>
+          <div class="card-icon blue">🔗</div>
+          <h2>Links e Imagens</h2>
+          <p>Conecte páginas com hiperlinks e insira imagens usando as tags a e img.</p>
+          <div class="card-tags">
+            <span class="ctag cyan">&lt;a&gt;</span>
+            <span class="ctag orange">&lt;img&gt;</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="status"><div class="dot"></div> Disponível</div>
+          <span>Playground interativo →</span>
+        </div>
+      </a>
+
+      <!-- Aula 4 — Em breve -->
+      <!-- <div class="lesson-card" style="opacity:.5; cursor:default; pointer-events:none;"> -->
+      <a href="formulario.html" class="lesson-card">
+        <div class="card-top">
+          <div class="card-number">AULA 04</div>
+          <div class="card-icon yellow">📋</div>
+          <h2>Formulários</h2>
+          <p>Crie campos de texto, botões e caixas de seleção para interagir com o usuário.</p>
+          <div class="card-tags">
+            <span class="ctag yellow">&lt;form&gt;</span>
+            <span class="ctag cyan">&lt;input&gt;</span>
+            <span class="ctag green">&lt;label&gt;</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="status"><div class="dot gray"></div> Em breve</div>
+        </div>
+      </a>
+
+      <!-- Aula 5 -->
+      <a href="css-interativo-iff.html" class="lesson-card">
+        <div class="card-top">
+          <div class="card-number">AULA 05</div>
+          <div class="card-arrow">↗</div>
+          <div class="card-icon blue">🎨</div>
+          <h2>CSS Interativo</h2>
+          <p>Pratique seletores, classes, IDs e estilos inline com exercícios guiados em tempo real.</p>
+          <div class="card-tags">
+            <span class="ctag cyan">{CSS}</span>
+            <span class="ctag purple">#id</span>
+            <span class="ctag green">.class</span>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="status"><div class="dot"></div> Disponível</div>
+          <span>Playground interativo →</span>
+        </div>
+      </a>
+
+    </div>
+
+    <!-- COMO FUNCIONA -->
+    <div class="how-section">
+      <div class="section-label">▸ como funciona</div>
+      <div class="section-title">Aprenda em 4 passos simples</div>
+      <div class="steps-grid">
+        <div class="step-card">
+          <div class="step-num">01</div>
+          <h3>Leia o conceito</h3>
+          <p>Cada aula explica o que a tag faz de forma simples e visual.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">02</div>
+          <h3>Veja o exemplo</h3>
+          <p>Código pronto com destaque de sintaxe para entender a estrutura.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">03</div>
+          <h3>Edite no playground</h3>
+          <p>Modifique o código e veja o resultado em tempo real no navegador.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-num">04</div>
+          <h3>Faça o exercício</h3>
+          <p>Desafios práticos para fixar o que aprendeu antes de avançar.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DICAS -->
+    <div class="section-label">▸ dicas de ouro</div>
+    <div class="tip-box">
+      <div>
+        <h3 class="green">✅ Sempre faça</h3>
+        <ul class="tip-do">
+          <li>Indente o código com espaços ou tab</li>
+          <li>Feche todas as tags que abre</li>
+          <li>Teste no navegador com frequência</li>
+          <li>Comece simples e vá adicionando</li>
+          <li>Use nomes descritivos para classes e IDs</li>
+        </ul>
+      </div>
+      <div>
+        <h3 class="red">❌ Evite fazer</h3>
+        <ul class="tip-dont">
+          <li>Copiar código sem entender o que faz</li>
+          <li>Usar letras maiúsculas nas tags HTML</li>
+          <li>Misturar muitos estilos inline</li>
+          <li>Desistir no primeiro erro — é normal!</li>
+          <li>Pular etapas para chegar ao final</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <footer>
+    <div class="wrap">
+      Aula HTML &nbsp;·&nbsp; <span>&lt;feito para aprender /&gt;</span> &nbsp;·&nbsp; Use o W3Schools e o MDN como referência
+    </div>
+  </footer>
+
+</body>
+</html>

@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estrutura Semântica HTML + CSS Layout</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #1e293b;
+      --bg2:     #1a2744;
+      --bg3:     #0f172a;
+      --tx:      #f8fafc;
+      --tx2:     #94a3b8;
+      --bd:      rgba(148,163,184,0.22);
+      --bd2:     rgba(148,163,184,0.38);
+      --blue:    #3b82f6;
+      --blue-lt: rgba(59,130,246,0.14);
+      --blue-dk: #2563eb;
+      --green:   #10b981;
+      --green-lt:rgba(16,185,129,0.14);
+      --red:     #ef4444;
+      --red-lt:  rgba(239,68,68,0.14);
+      --mono:    'Space Mono', monospace;
+      --sans:    'Sora', system-ui, -apple-system, sans-serif;
+      --r:       8px;
+    }
+
+    html { height:100%; scroll-behavior:smooth; }
+    body {
+      min-height:100%;
+      font-family:var(--sans);
+      background:var(--bg3);
+      color:var(--tx);
+      overflow-x:hidden;
+      position:relative;
+    }
+    body::before {
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px);
+      background-size:48px 48px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .app {
+      max-width:960px; margin:0 auto;
+      background:var(--bg); min-height:100vh;
+      display:flex; flex-direction:column;
+      border-left:0.5px solid var(--bd); border-right:0.5px solid var(--bd);
+      position:relative;
+      z-index:1;
+      box-shadow:0 24px 60px rgba(0,0,0,.35);
+    }
+
+    /* TOP BAR */
+    .topbar {
+      display:flex; align-items:center; gap:12px;
+      padding:11px 16px; border-bottom:0.5px solid var(--bd);
+      background:var(--bg); position:sticky; top:0; z-index:20;
+      justify-content:space-between;
+    }
+    .topbar-left { display:flex; align-items:center; gap:10px; }
+    .topbar-right { display:flex; align-items:center; gap:10px; color:var(--tx2); font-size:12px; }
+    .back-btn {
+      text-decoration:none;
+      color:var(--tx);
+      border:0.5px solid var(--bd2);
+      background:var(--bg2);
+      border-radius:99px;
+      padding:5px 10px;
+      font-size:12px;
+      font-weight:600;
+      transition:all .15s;
+    }
+    .back-btn:hover { border-color:var(--blue); color:var(--tx); background:var(--blue-lt); }
+    .topbar-pill {
+      font-family:var(--mono);
+      font-size:11px;
+      letter-spacing:.06em;
+      padding:4px 10px;
+      border-radius:99px;
+      border:0.5px solid rgba(59,130,246,.45);
+      background:rgba(59,130,246,.12);
+      color:#93c5fd;
+      font-weight:700;
+    }
+
+    .pills { display:flex; gap:5px; }
+    .pill {
+      width:26px; height:26px; border-radius:50%;
+      border:0.5px solid var(--bd2); background:var(--bg2);
+      color:var(--tx2); font-size:11px; font-weight:500;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .15s; font-family:var(--sans);
+    }
+    .pill.active { background:var(--blue); border-color:var(--blue); color:#E6F1FB; }
+    .pill.done   { background:var(--green); border-color:var(--green); color:#EAF3DE; }
+
+    .progbar { height:3px; background:var(--bd); }
+    .progfill { height:100%; background:var(--blue); transition:width .4s ease; border-radius:1px; }
+
+    /* GRID PRINCIPAL */
+    .body { display:grid; grid-template-columns:1fr 1fr; flex:1; min-height:0; }
+    .lpanel { border-right:0.5px solid var(--bd); display:flex; flex-direction:column; }
+    .rpanel { display:flex; flex-direction:column; }
+
+    .phdr {
+      padding:9px 14px; border-bottom:0.5px solid var(--bd);
+      font-size:11px; font-weight:500; color:var(--tx2);
+      text-transform:uppercase; letter-spacing:.06em;
+      display:flex; align-items:center; gap:7px;
+    }
+    .phdr .ti { font-size:13px; }
+
+    /* STEP CARD */
+    .stepcard { padding:13px 15px; border-bottom:0.5px solid var(--bd); }
+    .slabel { font-size:11px; font-weight:500; color:var(--blue); text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
+    .stitle { font-size:14px; font-weight:500; color:var(--tx); margin-bottom:5px; }
+    .sdesc  { font-size:12px; color:var(--tx2); line-height:1.55; }
+    .sdesc code { font-family:var(--mono); font-size:11px; background:var(--bg2); padding:1px 5px; border-radius:4px; color:#C0392B; }
+    .sdesc strong { font-weight:500; color:var(--tx); }
+
+    /* BLOCO CONCEITO */
+    .concept-box {
+      margin:10px 15px 0; padding:9px 12px;
+      background:var(--bg2); border-radius:var(--r); border:0.5px solid var(--bd);
+    }
+    .concept-title { font-size:10px; font-weight:500; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .concept-code { font-family:var(--mono); font-size:11px; color:var(--tx); line-height:1.65; white-space:pre-wrap; }
+
+    /* EDITOR — TAB SWITCHER */
+    .tab-bar {
+      display:flex; border-bottom:0.5px solid var(--bd);
+      background:var(--bg2);
+    }
+    .tab-btn {
+      padding:6px 14px; font-size:11px; font-weight:500;
+      color:var(--tx2); cursor:pointer; border:none;
+      background:none; border-bottom:2px solid transparent;
+      transition:all .15s; font-family:var(--sans);
+    }
+    .tab-btn.active { color:var(--blue); border-bottom-color:var(--blue); background:var(--bg); }
+    .tab-btn:hover  { color:var(--tx); }
+
+    .edwrap { flex:1; display:flex; flex-direction:column; min-height:0; }
+    .editor-pane { display:none; flex:1; flex-direction:column; min-height:0; }
+    .editor-pane.active { display:flex; }
+
+    textarea {
+      flex:1; width:100%; min-height:180px;
+      padding:13px; font-family:var(--mono); font-size:12.5px; line-height:1.65;
+      background:#0b1220; color:#dbeafe;
+      border:none; resize:none; outline:none; tab-size:2;
+    }
+
+    .edactions {
+      display:flex; gap:7px; padding:9px 13px;
+      border-top:0.5px solid var(--bd);
+      background:var(--bg2); align-items:center; flex-wrap:wrap;
+    }
+    .btn {
+      font-size:12px; font-weight:500; padding:5px 13px;
+      border-radius:var(--r); border:0.5px solid var(--bd2);
+      background:var(--bg); color:var(--tx);
+      cursor:pointer; transition:all .15s;
+      display:flex; align-items:center; gap:4px; font-family:var(--sans);
+    }
+    .btn:hover { background:var(--bg2); }
+    .btn.bp  { background:var(--blue);  border-color:var(--blue);  color:#E6F1FB; }
+    .btn.bp:hover  { background:var(--blue-dk); }
+    .btn.bdr { background:var(--red);   border-color:var(--red);   color:#FCEBEB; }
+    .btn.bdr:hover { background:#791F1F; }
+    .btn.bg  { background:var(--green); border-color:var(--green); color:#EAF3DE; }
+    .btn.bg:hover  { background:#27500A; }
+    .kbhint { margin-left:auto; font-size:10px; color:var(--tx2); }
+
+    /* FEEDBACK */
+    .fbbar {
+      padding:7px 13px; font-size:12px; min-height:32px;
+      border-top:0.5px solid var(--bd); display:flex; align-items:center; gap:6px;
+    }
+    .fbbar.ok   { color:var(--green); background:var(--green-lt); }
+    .fbbar.err  { color:var(--red);   background:var(--red-lt); }
+    .fbbar.idle { color:var(--tx2);   background:var(--bg2); }
+    .fbbar.hint { color:var(--blue);  background:var(--blue-lt); }
+
+    /* MODAL */
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.55);
+      display:none; align-items:center; justify-content:center;
+      z-index:100; padding:16px;
+    }
+    .modal-overlay.aberto { display:flex; }
+    .modal-box {
+      width:min(680px,100%); background:var(--bg);
+      border:0.5px solid var(--bd2); border-radius:12px;
+      box-shadow:0 12px 36px rgba(0,0,0,0.24); overflow:hidden;
+    }
+    .modal-head {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding:10px 14px; border-bottom:0.5px solid var(--bd);
+      font-size:12px; font-weight:600; color:var(--tx);
+    }
+    .modal-tabs { display:flex; gap:6px; }
+    .modal-tab {
+      font-size:11px; font-weight:500; padding:3px 10px;
+      border-radius:99px; border:0.5px solid var(--bd2);
+      background:var(--bg2); color:var(--tx2); cursor:pointer;
+      font-family:var(--sans);
+    }
+    .modal-tab.active { background:var(--blue); border-color:var(--blue); color:#E6F1FB; }
+    .modal-code {
+      margin:0; padding:14px; background:#0b1220; color:#dbeafe;
+      font-family:var(--mono); font-size:12.5px; line-height:1.6;
+      white-space:pre; overflow:auto; max-height:55vh;
+    }
+    .modal-actions { display:flex; gap:6px; }
+
+    /* PREVIEW IFRAME */
+    .preview-wrap { flex:1; display:flex; flex-direction:column; min-height:0; }
+    .preview-header {
+      display:flex; align-items:center; gap:8px;
+      padding:6px 14px; border-bottom:0.5px solid var(--bd);
+      background:var(--bg2);
+    }
+    .preview-url {
+      flex:1; font-family:var(--mono); font-size:11px; color:var(--tx2);
+      background:var(--bg3); border:0.5px solid var(--bd);
+      border-radius:4px; padding:3px 8px;
+    }
+    .preview-badge {
+      font-size:10px; font-weight:500; padding:2px 8px; border-radius:99px;
+      background:var(--green-lt); color:var(--green); border:0.5px solid rgba(16,185,129,.45);
+    }
+    .preview-frame { flex:1; border:none; width:100%; min-height:280px; display:block; }
+
+    /* MAPA SEMÂNTICO — legenda colorida */
+    .tagmap-section {
+      border-top:0.5px solid var(--bd); padding:10px 14px;
+    }
+    .tagmap-title { font-size:10px; font-weight:500; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; }
+    .tagmap-grid { display:flex; flex-wrap:wrap; gap:5px; }
+    .tagmap-item {
+      display:flex; align-items:center; gap:5px;
+      font-size:10px; font-family:var(--mono);
+      padding:3px 8px; border-radius:4px; border:0.5px solid;
+      cursor:pointer; transition:all .15s;
+    }
+    .tagmap-dot { width:8px; height:8px; border-radius:2px; flex-shrink:0; }
+
+    /* GUIA */
+    .guide-wrap { border-top:0.5px solid var(--bd); }
+    .guide-toggle { cursor:pointer; }
+    .ginner { padding:8px 14px; }
+    .ptable { width:100%; border-collapse:collapse; font-size:11px; }
+    .ptable th { text-align:left; color:var(--tx2); font-weight:500; padding:3px 5px; border-bottom:0.5px solid var(--bd); }
+    .ptable td { padding:3px 5px; color:var(--tx); vertical-align:top; }
+    .ptable td:first-child { font-family:var(--mono); font-size:10.5px; color:#C0392B; white-space:nowrap; }
+    .ptable td:last-child  { color:var(--tx2); font-size:10.5px; }
+
+    /* NAV */
+    .navrow {
+      display:flex; gap:7px; padding:9px 13px;
+      border-top:0.5px solid var(--bd); background:var(--bg2); align-items:center;
+    }
+    .navlabel { font-size:11px; color:var(--tx2); flex:1; }
+    .complete-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:500; padding:3px 9px; border-radius:99px;
+      background:var(--green-lt); color:var(--green); border:0.5px solid rgba(16,185,129,.45);
+    }
+
+    .conquest { display:none; padding:14px 16px; background:var(--green-lt); border-top:0.5px solid rgba(16,185,129,.45); font-size:13px; color:var(--green); font-weight:500; text-align:center; }
+    .conquest.show { display:block; }
+
+    @media (max-width:620px) {
+      .body { grid-template-columns:1fr; }
+      .lpanel { border-right:none; border-bottom:0.5px solid var(--bd); }
+      .kbhint { display:none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html" class="back-btn">← Voltar</a>
+      <span class="topbar-pill">AULA 08</span>
+    </div>
+    <div class="topbar-right">
+      <span>estrutura-semantica.html</span>
+      <div class="pills" id="pills"></div>
+    </div>
+  </div>
+  <div class="progbar"><div class="progfill" id="progfill" style="width:25%"></div></div>
+
+  <div class="body">
+
+    <!-- ESQUERDO -->
+    <div class="lpanel">
+      <div class="phdr"><i class="ti ti-terminal"></i> editor html + css</div>
+
+      <div class="stepcard">
+        <div class="slabel" id="slabel">Etapa 1 de 4</div>
+        <div class="stitle" id="stitle">Esqueleto HTML Semântico</div>
+        <div class="sdesc"  id="sdesc"></div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-title">conceito da etapa</div>
+        <pre class="concept-code" id="concept-code"></pre>
+      </div>
+
+      <div class="edwrap">
+        <div class="tab-bar" id="tab-bar">
+          <button class="tab-btn active" onclick="trocarTab('html')">HTML</button>
+          <button class="tab-btn" onclick="trocarTab('css')" id="tab-css-btn">CSS</button>
+        </div>
+        <div class="editor-pane active" id="pane-html">
+          <textarea id="editor-html" spellcheck="false" autocomplete="off"></textarea>
+        </div>
+        <div class="editor-pane" id="pane-css">
+          <textarea id="editor-css" spellcheck="false" autocomplete="off"></textarea>
+        </div>
+      </div>
+
+      <div class="edactions">
+        <button class="btn bp"  onclick="aplicar()"><i class="ti ti-player-play"></i> Aplicar</button>
+        <button class="btn"     onclick="abrirModal()"><i class="ti ti-code"></i> Código</button>
+        <button class="btn"     onclick="dica()"><i class="ti ti-bulb"></i> Dica</button>
+        <button class="btn bdr" onclick="resetar()"><i class="ti ti-refresh"></i> Reset</button>
+        <span class="kbhint">Ctrl+Enter aplica</span>
+      </div>
+      <div class="fbbar idle" id="fbbar">
+        <i class="ti ti-info-circle"></i>
+        <span>Edite o HTML e/ou CSS e clique em Aplicar.</span>
+      </div>
+    </div>
+
+    <!-- DIREITO -->
+    <div class="rpanel">
+      <div class="preview-header">
+        <i class="ti ti-world" style="font-size:13px;color:var(--tx2)"></i>
+        <span class="preview-url">index.html</span>
+        <span class="preview-badge">iframe real</span>
+      </div>
+
+      <div class="preview-wrap">
+        <iframe id="preview-frame" class="preview-frame"></iframe>
+      </div>
+
+      <div class="tagmap-section" id="tagmap-section">
+        <div class="tagmap-title">tags semânticas desta etapa</div>
+        <div class="tagmap-grid" id="tagmap-grid"></div>
+      </div>
+
+      <div class="guide-wrap">
+        <div class="phdr guide-toggle" onclick="toggleGuide()">
+          <i class="ti ti-list"></i> propriedades desta etapa
+          <i class="ti ti-chevron-down" id="gchev" style="margin-left:auto;font-size:11px;transition:transform .2s"></i>
+        </div>
+        <div class="ginner" id="ginner">
+          <table class="ptable">
+            <thead><tr><th>tag / propriedade</th><th>função</th><th>exemplo</th></tr></thead>
+            <tbody id="ptbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="navrow">
+        <button class="btn" onclick="anterior()" id="btnprev" style="display:none">
+          <i class="ti ti-arrow-left"></i> Anterior
+        </button>
+        <span class="navlabel" id="navlabel"></span>
+        <button class="btn bg" id="btnnext" onclick="proximo()">
+          Próxima etapa <i class="ti ti-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="conquest" id="conquest">
+    <i class="ti ti-trophy"></i> Parabéns! Você montou uma página completa com HTML semântico e posicionamento CSS real!
+  </div>
+</div>
+
+<!-- MODAL CÓDIGO -->
+<div class="modal-overlay" id="codigo-modal" onclick="fecharModal(event)">
+  <div class="modal-box" role="dialog" aria-modal="true">
+    <div class="modal-head">
+      <div class="modal-tabs">
+        <button class="modal-tab active" onclick="trocarModalTab('html')">index.html</button>
+        <button class="modal-tab" onclick="trocarModalTab('css')" id="modal-css-tab">style.css</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn" onclick="copiarModal()"><i class="ti ti-copy"></i> Copiar</button>
+        <button class="btn" onclick="fecharModal()"><i class="ti ti-x"></i> Fechar</button>
+      </div>
+    </div>
+    <pre class="modal-code" id="modal-conteudo"></pre>
+  </div>
+</div>
+
+<script>
+// ── Paleta de cores para as tags ──
+const TAG_CORES = {
+  header:  { bg:'#FEF9C3', bd:'#CA8A04', tx:'#713F12' },
+  nav:     { bg:'#DCFCE7', bd:'#16A34A', tx:'#14532D' },
+  main:    { bg:'#DBEAFE', bd:'#2563EB', tx:'#1E3A8A' },
+  section: { bg:'#EDE9FE', bd:'#7C3AED', tx:'#4C1D95' },
+  article: { bg:'#FCE7F3', bd:'#DB2777', tx:'#831843' },
+  aside:   { bg:'#FFEDD5', bd:'#EA580C', tx:'#7C2D12' },
+  footer:  { bg:'#F1F5F9', bd:'#64748B', tx:'#1E293B' },
+};
+
+// ══════════════════════════════════════════
+// ETAPAS
+// ══════════════════════════════════════════
+const E = [
+  // ─────────────────────────────────────────
+  // ETAPA 1 — Esqueleto HTML semântico
+  // ─────────────────────────────────────────
+  {
+    label:'Etapa 1 de 4', titulo:'Esqueleto HTML Semântico',
+    desc:'Cada parte de uma página tem uma <strong>tag com significado</strong>. Use <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;aside&gt;</code> e <code>&lt;footer&gt;</code> para estruturar o conteúdo corretamente.',
+    conceito:`<!-- Em vez de <div> para tudo: -->
+<header>  → cabeçalho (logo, título)
+<nav>     → menu de navegação
+<main>    → conteúdo principal
+  <section> → seção temática
+  <article> → conteúdo independente
+<aside>   → barra lateral
+<footer>  → rodapé da página`,
+    html:`<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Minha Página</title>
+</head>
+<body>
+
+  <header>
+    <h1>Meu Site</h1>
+  </header>
+
+  <nav>
+    <a href="#">Início</a>
+    <a href="#">Sobre</a>
+    <a href="#">Contato</a>
+  </nav>
+
+  <main>
+    <section>
+      <h2>Bem-vindo</h2>
+      <article>
+        <p>Este é o conteúdo principal da página.</p>
+      </article>
+    </section>
+  </main>
+
+  <aside>
+    <p>Barra lateral</p>
+  </aside>
+
+  <footer>
+    <p>© 2025 Meu Site</p>
+  </footer>
+
+</body>
+</html>`,
+    css:`/* Sem CSS ainda — veja as tags empilhadas no fluxo normal */
+body {
+  font-family: sans-serif;
+  margin: 8px;
+}
+
+header  { background: #FEF9C3; padding: 12px; }
+nav     { background: #DCFCE7; padding: 8px; }
+main    { background: #DBEAFE; padding: 12px; }
+section { background: #EDE9FE; padding: 10px; }
+article { background: #FCE7F3; padding: 8px; }
+aside   { background: #FFEDD5; padding: 12px; }
+footer  { background: #F1F5F9; padding: 8px; }`,
+    tags:['header','nav','main','section','article','aside','footer'],
+    props:[
+      ['<header>','Cabeçalho da página','logo, título, branding'],
+      ['<nav>','Menu de navegação','links internos e externos'],
+      ['<main>','Conteúdo principal','único por página'],
+      ['<section>','Seção temática','agrupa assuntos relacionados'],
+      ['<article>','Conteúdo independente','post, notícia, card'],
+      ['<aside>','Conteúdo lateral','sidebar, links extras'],
+      ['<footer>','Rodapé','copyright, contatos'],
+    ],
+    dicas:[
+      'As tags empilham uma abaixo da outra — esse é o fluxo normal do HTML sem CSS.',
+      'Cada tag tem cor diferente para você visualizar onde começa e termina.',
+      'Tente adicionar mais links no <nav> ou texto no <article>.',
+      '<main> só deve aparecer UMA VEZ por página — é o conteúdo único daquela página.',
+      'Sem position ou display, os elementos de bloco ocupam toda a largura.',
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // ETAPA 2 — Flexbox: header e nav
+  // ─────────────────────────────────────────
+  {
+    label:'Etapa 2 de 4', titulo:'Flexbox — Header e Nav',
+    desc:'Com <code>display: flex</code> você organiza os filhos em <strong>linha ou coluna</strong>. No header: logo à esquerda e ações à direita. No nav: links lado a lado com espaço entre eles.',
+    conceito:`header {
+  display: flex;
+  justify-content: space-between; /* esquerda ↔ direita */
+  align-items: center;            /* centraliza vertical */
+}
+
+nav {
+  display: flex;
+  gap: 16px; /* espaço entre os links */
+}`,
+    html:`<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Minha Página</title>
+</head>
+<body>
+
+  <header>
+    <h1>Meu Site</h1>
+    <span>Menu ↓</span>
+  </header>
+
+  <nav>
+    <a href="#">Início</a>
+    <a href="#">Sobre</a>
+    <a href="#">Portfólio</a>
+    <a href="#">Contato</a>
+  </nav>
+
+  <main>
+    <section>
+      <h2>Conteúdo Principal</h2>
+      <p>Aqui vai o texto da página.</p>
+    </section>
+  </main>
+
+  <aside>
+    <p>📌 Links úteis</p>
+    <p>📌 Categorias</p>
+  </aside>
+
+  <footer>
+    <p>© 2025 Meu Site</p>
+  </footer>
+
+</body>
+</html>`,
+    css:`body {
+  font-family: sans-serif;
+  margin: 0;
+}
+
+/* ── HEADER com Flexbox ── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e293b;
+  color: white;
+  padding: 14px 24px;
+}
+
+header h1 { font-size: 18px; }
+header span { font-size: 13px; color: #94a3b8; }
+
+/* ── NAV com Flexbox ── */
+nav {
+  display: flex;
+  gap: 0;
+  background: #334155;
+  padding: 0 24px;
+}
+
+nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 10px 16px;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+
+nav a:hover { background: #475569; color: white; }
+
+/* ── resto ── */
+main    { background: #DBEAFE; padding: 20px 24px; }
+section { background: white; padding: 16px; border-radius: 6px; }
+aside   { background: #FFEDD5; padding: 16px 24px; }
+footer  { background: #1e293b; color: #94a3b8; padding: 12px 24px; font-size: 12px; }`,
+    tags:['header','nav','main','aside','footer'],
+    props:[
+      ['display: flex','Ativa Flexbox no elemento','itens ficam lado a lado'],
+      ['justify-content','Distribui no eixo horizontal','space-between, center, flex-end'],
+      ['align-items','Alinha no eixo vertical','center, flex-start, stretch'],
+      ['gap','Espaço entre os filhos','16px, 8px, 0'],
+      ['flex-direction','Direção dos itens','row (padrão), column'],
+    ],
+    dicas:[
+      'justify-content: space-between empurra o primeiro item para esquerda e o último para direita.',
+      'Tente justify-content: center no nav para centralizar os links.',
+      'gap substitui margin entre os itens — muito mais prático!',
+      'align-items: center alinha tudo no meio vertical do container.',
+      'Tente flex-direction: column no nav para empilhar os links verticalmente.',
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // ETAPA 3 — CSS Grid: layout main + aside
+  // ─────────────────────────────────────────
+  {
+    label:'Etapa 3 de 4', titulo:'CSS Grid — Content + Sidebar',
+    desc:'Com <code>display: grid</code> e <code>grid-template-columns</code> você coloca o <code>main</code> e o <code>aside</code> <strong>lado a lado</strong>. A unidade <code>fr</code> divide o espaço disponível proporcionalmente.',
+    conceito:`.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 280px;
+  /* 1fr = ocupa o resto  |  280px = largura fixa */
+  gap: 20px;
+}`,
+    html:`<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Minha Página</title>
+</head>
+<body>
+
+  <header>
+    <h1>Meu Site</h1>
+    <span>Menu ↓</span>
+  </header>
+
+  <nav>
+    <a href="#">Início</a>
+    <a href="#">Sobre</a>
+    <a href="#">Portfólio</a>
+    <a href="#">Contato</a>
+  </nav>
+
+  <!-- wrapper envolve main + aside lado a lado -->
+  <div class="wrapper">
+
+    <main>
+      <section>
+        <h2>Artigo Principal</h2>
+        <article>
+          <p>Lorem ipsum dolor sit amet, consectetur
+          adipiscing elit. Sed do eiusmod tempor.</p>
+        </article>
+      </section>
+    </main>
+
+    <aside>
+      <h3>Categorias</h3>
+      <p>📌 HTML</p>
+      <p>📌 CSS</p>
+      <p>📌 JavaScript</p>
+    </aside>
+
+  </div>
+
+  <footer>
+    <p>© 2025 Meu Site</p>
+  </footer>
+
+</body>
+</html>`,
+    css:`body {
+  font-family: sans-serif;
+  margin: 0;
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e293b;
+  color: white;
+  padding: 14px 24px;
+}
+header h1 { font-size: 18px; }
+header span { font-size: 13px; color: #94a3b8; }
+
+nav {
+  display: flex;
+  background: #334155;
+  padding: 0 24px;
+}
+nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 10px 16px;
+  font-size: 13px;
+}
+nav a:hover { background: #475569; color: white; }
+
+/* ── GRID: main + aside lado a lado ── */
+.wrapper {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 0;
+  background: #f1f5f9;
+}
+
+main {
+  padding: 24px;
+}
+
+section {
+  background: white;
+  padding: 20px;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+}
+
+section h2 { margin-bottom: 10px; font-size: 16px; color: #1e293b; }
+
+article p { font-size: 13px; color: #64748b; line-height: 1.7; }
+
+aside {
+  background: #FFEDD5;
+  padding: 20px;
+  border-left: 1px solid #fed7aa;
+}
+
+aside h3 { font-size: 13px; color: #9a3412; margin-bottom: 10px; }
+aside p  { font-size: 12px; color: #7c2d12; padding: 4px 0; }
+
+footer {
+  background: #1e293b;
+  color: #94a3b8;
+  padding: 12px 24px;
+  font-size: 12px;
+}`,
+    tags:['main','section','article','aside'],
+    props:[
+      ['display: grid','Ativa CSS Grid no container','filhos viram células da grade'],
+      ['grid-template-columns','Define largura das colunas','1fr 280px, 2fr 1fr, repeat(3,1fr)'],
+      ['1fr','Fração do espaço disponível','1fr = ocupa o restante'],
+      ['gap','Espaço entre células','20px, 16px 24px'],
+      ['grid-column','Quantas colunas o item ocupa','span 2, 1 / 3'],
+    ],
+    dicas:[
+      '1fr significa "1 fração do espaço que sobrou" — muito mais flexível que porcentagem.',
+      'Tente mudar para grid-template-columns: 2fr 1fr e veja a proporção mudar.',
+      'Tente grid-template-columns: 1fr 1fr para colunas iguais.',
+      'gap define espaço entre as células — tente gap: 24px.',
+      'O aside fica automaticamente na segunda coluna — sem position, sem float!',
+    ],
+  },
+
+  // ─────────────────────────────────────────
+  // ETAPA 4 — grid-template-areas: layout completo
+  // ─────────────────────────────────────────
+  {
+    label:'Etapa 4 de 4', titulo:'grid-template-areas — Página Completa',
+    desc:'Com <code>grid-template-areas</code> você <strong>desenha o layout em texto</strong> dentro do CSS — cada string é uma linha, cada palavra é uma área. É como o diagrama do wireframe virar código.',
+    conceito:`body {
+  display: grid;
+  grid-template-areas:
+    "header  header"
+    "nav     nav"
+    "main    aside"
+    "footer  footer";
+  grid-template-columns: 1fr 240px;
+}
+
+header { grid-area: header; }
+nav    { grid-area: nav;    }
+main   { grid-area: main;   }
+aside  { grid-area: aside;  }
+footer { grid-area: footer; }`,
+    html:`<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Minha Página</title>
+</head>
+<body>
+
+  <header>
+    <h1>🌐 Meu Site</h1>
+    <span>Desenvolvimento Web</span>
+  </header>
+
+  <nav>
+    <a href="#">Início</a>
+    <a href="#">Sobre</a>
+    <a href="#">Portfólio</a>
+    <a href="#">Blog</a>
+    <a href="#">Contato</a>
+  </nav>
+
+  <main>
+    <section>
+      <h2>Artigo em Destaque</h2>
+      <article>
+        <h3>HTML Semântico</h3>
+        <p>Usar as tags certas torna a página mais
+        acessível, bem ranqueada e fácil de manter.</p>
+      </article>
+      <article style="margin-top:12px">
+        <h3>CSS Grid</h3>
+        <p>grid-template-areas é a forma mais legível
+        de criar layouts complexos com CSS puro.</p>
+      </article>
+    </section>
+  </main>
+
+  <aside>
+    <h3>📌 Sobre</h3>
+    <p>Este site foi criado com HTML semântico e
+    CSS Grid — sem frameworks, sem JavaScript!</p>
+    <hr style="margin:10px 0; border-color:#fed7aa">
+    <h3>🏷️ Tags</h3>
+    <p>HTML · CSS · Semântica · Grid</p>
+  </aside>
+
+  <footer>
+    <p>© 2025 Meu Site · Feito com HTML + CSS</p>
+  </footer>
+
+</body>
+</html>`,
+    css:`/* ══ LAYOUT COMPLETO com grid-template-areas ══ */
+body {
+  font-family: sans-serif;
+  margin: 0;
+  min-height: 100vh;
+
+  display: grid;
+  grid-template-areas:
+    "header  header"
+    "nav     nav"
+    "main    aside"
+    "footer  footer";
+  grid-template-columns: 1fr 240px;
+  grid-template-rows: auto auto 1fr auto;
+}
+
+/* ── cada elemento declara sua área ── */
+header { grid-area: header; }
+nav    { grid-area: nav;    }
+main   { grid-area: main;   }
+aside  { grid-area: aside;  }
+footer { grid-area: footer; }
+
+/* ── estilos visuais ── */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #1e293b;
+  color: white;
+  padding: 16px 24px;
+}
+header h1   { font-size: 18px; }
+header span { font-size: 12px; color: #94a3b8; }
+
+nav {
+  display: flex;
+  background: #334155;
+  padding: 0 24px;
+  border-bottom: 2px solid #3b82f6;
+}
+nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  padding: 10px 14px;
+  font-size: 13px;
+  transition: background 0.2s;
+}
+nav a:hover { background: #475569; color: white; }
+
+main {
+  background: #f8fafc;
+  padding: 24px;
+}
+section {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 20px;
+}
+section h2 {
+  font-size: 15px;
+  color: #1e293b;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e2e8f0;
+}
+article h3  { font-size: 13px; color: #2563eb; margin-bottom: 4px; }
+article p   { font-size: 12px; color: #64748b; line-height: 1.7; }
+
+aside {
+  background: #fff7ed;
+  border-left: 3px solid #fb923c;
+  padding: 20px;
+}
+aside h3 { font-size: 12px; color: #9a3412; font-weight: 600; margin-bottom: 6px; }
+aside p  { font-size: 11px; color: #7c2d12; line-height: 1.6; }
+
+footer {
+  background: #0f172a;
+  color: #64748b;
+  text-align: center;
+  padding: 14px;
+  font-size: 12px;
+}`,
+    tags:['header','nav','main','section','article','aside','footer'],
+    props:[
+      ['grid-template-areas','Desenha o layout em texto','"header header" "main aside"'],
+      ['grid-area','Nomeia o elemento para o grid','grid-area: header'],
+      ['grid-template-rows','Altura de cada linha','auto auto 1fr auto'],
+      ['1fr (row)','Linha ocupa o espaço restante','empurra o footer para baixo'],
+      ['min-height: 100vh','Body ocupa a tela toda','footer fica no fundo'],
+    ],
+    dicas:[
+      'grid-template-areas é como um wireframe escrito em CSS — compare com o diagrama da aula!',
+      'Cada string entre aspas representa UMA LINHA do layout.',
+      'Repita o nome de uma área em duas colunas para ela ocupar toda a largura: "header header".',
+      'grid-template-rows: auto auto 1fr auto — o 1fr faz o main crescer e empurra o footer.',
+      'Tente mudar grid-template-columns para 1fr 300px e veja o aside ficar mais largo.',
+      'Troque "main aside" por "aside main" e veja o sidebar ir para a esquerda!',
+    ],
+  },
+];
+
+// ══════════════════════════════════════════
+// ESTADO
+// ══════════════════════════════════════════
+let etapa = 0, dicaI = 0, guideOpen = true, tabAtual = 'html', modalTabAtual = 'html';
+const done = new Set();
+const edHtml = document.getElementById('editor-html');
+const edCss  = document.getElementById('editor-css');
+const frame  = document.getElementById('preview-frame');
+
+// ── Render ──
+function montar(html, css) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*,*::before,*::after{box-sizing:border-box;}${css}</style></head><body>${extrairBody(html)}</body></html>`;
+}
+
+function extrairBody(html) {
+  const m = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
+  return m ? m[1] : html;
+}
+
+function aplicar(silente) {
+  frame.srcdoc = montar(edHtml.value, edCss.value);
+  if (!silente) fb('ok','ti-check','HTML + CSS aplicados com sucesso!');
+}
+
+function resetar() {
+  const e = E[etapa];
+  edHtml.value = e.html;
+  edCss.value  = e.css;
+  aplicar(true);
+  fb('idle','ti-refresh','Código restaurado para o exemplo da etapa.');
+}
+
+function dica() {
+  const ds = E[etapa].dicas;
+  fb('hint','ti-bulb', ds[dicaI % ds.length]);
+  dicaI++;
+}
+
+function fb(tipo, icon, msg) {
+  const bar = document.getElementById('fbbar');
+  bar.className = 'fbbar ' + tipo;
+  bar.innerHTML = `<i class="ti ${icon}"></i> <span>${msg}</span>`;
+}
+
+// ── Tabs HTML / CSS ──
+function trocarTab(tab) {
+  tabAtual = tab;
+  document.getElementById('pane-html').classList.toggle('active', tab === 'html');
+  document.getElementById('pane-css').classList.toggle('active',  tab === 'css');
+  document.querySelectorAll('.tab-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim().toLowerCase().startsWith(tab));
+  });
+}
+
+// ── Modal ──
+function abrirModal() {
+  modalTabAtual = tabAtual;
+  atualizarModalConteudo();
+  document.getElementById('codigo-modal').classList.add('aberto');
+}
+function fecharModal(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('codigo-modal').classList.remove('aberto');
+}
+function trocarModalTab(tab) {
+  modalTabAtual = tab;
+  atualizarModalConteudo();
+  document.querySelectorAll('.modal-tab').forEach(b => {
+    b.classList.toggle('active', b.textContent.includes(tab === 'html' ? '.html' : '.css'));
+  });
+}
+function atualizarModalConteudo() {
+  document.getElementById('modal-conteudo').textContent =
+    modalTabAtual === 'html' ? edHtml.value : edCss.value;
+}
+function copiarModal() {
+  navigator.clipboard.writeText(document.getElementById('modal-conteudo').textContent)
+    .then(() => fb('ok','ti-copy','Código copiado!'))
+    .catch(() => fb('err','ti-alert-circle','Não foi possível copiar.'));
+}
+
+// ── Pills ──
+function pills() {
+  const w = document.getElementById('pills');
+  w.innerHTML = '';
+  E.forEach((_,i) => {
+    const b = document.createElement('button');
+    b.className = 'pill'+(i===etapa?' active':'')+(done.has(i)&&i!==etapa?' done':'');
+    b.textContent = i+1; b.title = E[i].titulo;
+    b.onclick = () => ir(i);
+    w.appendChild(b);
+  });
+}
+
+// ── Tag map ──
+function buildTagmap() {
+  const grid = document.getElementById('tagmap-grid');
+  grid.innerHTML = '';
+  (E[etapa].tags || []).forEach(tag => {
+    const c = TAG_CORES[tag] || { bg:'#F3F4F6', bd:'#9CA3AF', tx:'#374151' };
+    const item = document.createElement('div');
+    item.className = 'tagmap-item';
+    item.style.cssText = `background:${c.bg};border-color:${c.bd};color:${c.tx}`;
+    item.innerHTML = `<span class="tagmap-dot" style="background:${c.bd}"></span>&lt;${tag}&gt;`;
+    item.title = `Clique para destacar no editor`;
+    grid.appendChild(item);
+  });
+}
+
+// ── Prop table ──
+function propTable() {
+  const tb = document.getElementById('ptbody');
+  tb.innerHTML = '';
+  E[etapa].props.forEach(([p,d,ex]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${p}</td><td>${d}</td><td>${ex}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+// ── Load etapa ──
+function load(idx) {
+  const e = E[idx];
+  document.getElementById('slabel').textContent = e.label;
+  document.getElementById('stitle').textContent = e.titulo;
+  document.getElementById('sdesc').innerHTML    = e.desc;
+  document.getElementById('concept-code').textContent = e.conceito;
+  edHtml.value = e.html;
+  edCss.value  = e.css;
+  dicaI = 0;
+  trocarTab('html');
+  propTable();
+  buildTagmap();
+  aplicar(true);
+  document.getElementById('progfill').style.width = ((idx+1)/E.length*100)+'%';
+  document.getElementById('btnprev').style.display = idx === 0 ? 'none' : '';
+
+  const nb = document.getElementById('btnnext');
+  if (idx === E.length-1) {
+    nb.innerHTML = '<i class="ti ti-check"></i> Concluir!';
+    nb.onclick = concluir;
+  } else {
+    nb.innerHTML = 'Próxima etapa <i class="ti ti-arrow-right"></i>';
+    nb.onclick = proximo;
+  }
+  document.getElementById('navlabel').innerHTML = idx < E.length-1
+    ? `<span style="font-size:11px;color:var(--tx2)">Etapa ${idx+1} de ${E.length}</span>`
+    : `<span class="complete-badge"><i class="ti ti-star"></i> Última etapa!</span>`;
+
+  fb('idle','ti-info-circle','Edite o HTML e/ou o CSS e clique em Aplicar.');
+  pills();
+}
+
+function ir(idx)    { etapa=idx; load(idx); }
+function proximo()  { done.add(etapa); if(etapa<E.length-1){etapa++;load(etapa);} }
+function anterior() { if(etapa>0){etapa--;load(etapa);} }
+function concluir() { done.add(etapa); pills(); document.getElementById('conquest').classList.add('show'); fb('ok','ti-trophy','Layout completo montado!'); }
+
+function toggleGuide() {
+  guideOpen = !guideOpen;
+  document.getElementById('ginner').style.display = guideOpen ? '' : 'none';
+  document.getElementById('gchev').style.transform = guideOpen ? '' : 'rotate(-90deg)';
+}
+
+// ── Teclado ──
+[edHtml, edCss].forEach(ed => {
+  ed.addEventListener('keydown', ev => {
+    if (ev.ctrlKey && ev.key==='Enter') { ev.preventDefault(); aplicar(); }
+    if (ev.key==='Escape') fecharModal();
+    if (ev.key==='Tab') {
+      ev.preventDefault();
+      const s = ed.selectionStart;
+      ed.value = ed.value.substring(0,s)+'  '+ed.value.substring(ed.selectionEnd);
+      ed.selectionStart = ed.selectionEnd = s+2;
+    }
+  });
+});
+
+// ── Init ──
+load(0);
+</script>
+</body>
+</html>

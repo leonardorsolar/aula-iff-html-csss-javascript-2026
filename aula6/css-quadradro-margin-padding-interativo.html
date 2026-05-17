@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Box Model — Interativo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #1e293b;
+      --bg2:     #1a2744;
+      --bg3:     #0f172a;
+      --tx:      #f8fafc;
+      --tx2:     #94a3b8;
+      --bd:      rgba(148,163,184,0.22);
+      --bd2:     rgba(148,163,184,0.38);
+      --blue:    #3b82f6;
+      --blue-lt: rgba(59,130,246,0.14);
+      --blue-dk: #2563eb;
+      --green:   #10b981;
+      --green-lt:rgba(16,185,129,0.14);
+      --red:     #ef4444;
+      --red-lt:  rgba(239,68,68,0.14);
+      --orange:  #f59e0b;
+      --orange-lt:rgba(245,158,11,0.14);
+      --mono:    'Space Mono', monospace;
+      --sans:    'Sora', system-ui, -apple-system, sans-serif;
+      --r:       8px;
+    }
+
+    html { height:100%; scroll-behavior:smooth; }
+    body {
+      min-height:100%;
+      font-family:var(--sans);
+      background:var(--bg3);
+      color:var(--tx);
+      overflow-x:hidden;
+      position:relative;
+    }
+    body::before {
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px);
+      background-size:48px 48px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .app {
+      max-width:960px; margin:0 auto;
+      background:var(--bg); min-height:100vh;
+      display:flex; flex-direction:column;
+      border-left:0.5px solid var(--bd); border-right:0.5px solid var(--bd);
+      position:relative;
+      z-index:1;
+      box-shadow:0 24px 60px rgba(0,0,0,.35);
+    }
+
+    /* TOP BAR */
+    .topbar {
+      display:flex; align-items:center; gap:12px;
+      padding:11px 16px; border-bottom:0.5px solid var(--bd);
+      background:var(--bg); position:sticky; top:0; z-index:20;
+      justify-content:space-between;
+    }
+    .topbar-left { display:flex; align-items:center; gap:10px; }
+    .topbar-right { display:flex; align-items:center; gap:10px; color:var(--tx2); font-size:12px; }
+    .back-btn {
+      text-decoration:none;
+      color:var(--tx);
+      border:0.5px solid var(--bd2);
+      background:var(--bg2);
+      border-radius:99px;
+      padding:5px 10px;
+      font-size:12px;
+      font-weight:600;
+      transition:all .15s;
+    }
+    .back-btn:hover { border-color:var(--blue); color:var(--tx); background:var(--blue-lt); }
+    .topbar-pill {
+      font-family:var(--mono);
+      font-size:11px;
+      letter-spacing:.06em;
+      padding:4px 10px;
+      border-radius:99px;
+      border:0.5px solid rgba(59,130,246,.45);
+      background:rgba(59,130,246,.12);
+      color:#93c5fd;
+      font-weight:700;
+    }
+
+    .pills { display:flex; gap:5px; }
+    .pill {
+      width:26px; height:26px; border-radius:50%;
+      border:0.5px solid var(--bd2); background:var(--bg2);
+      color:var(--tx2); font-size:11px; font-weight:500;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .15s; font-family:var(--sans);
+    }
+    .pill.active { background:var(--blue); border-color:var(--blue); color:#E6F1FB; }
+    .pill.done   { background:var(--green); border-color:var(--green); color:#EAF3DE; }
+
+    .progbar { height:3px; background:var(--bd); }
+    .progfill { height:100%; background:var(--blue); transition:width .4s ease; border-radius:1px; }
+
+    /* GRID PRINCIPAL */
+    .body { display:grid; grid-template-columns:1fr 1fr; flex:1; min-height:0; }
+    .lpanel { border-right:0.5px solid var(--bd); display:flex; flex-direction:column; }
+    .rpanel { display:flex; flex-direction:column; }
+
+    .phdr {
+      padding:9px 14px; border-bottom:0.5px solid var(--bd);
+      font-size:11px; font-weight:500; color:var(--tx2);
+      text-transform:uppercase; letter-spacing:.06em;
+      display:flex; align-items:center; gap:7px;
+    }
+    .phdr .ti { font-size:13px; }
+
+    /* STEP CARD */
+    .stepcard { padding:13px 15px; border-bottom:0.5px solid var(--bd); }
+    .slabel { font-size:11px; font-weight:500; color:var(--blue); text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
+    .stitle { font-size:14px; font-weight:500; color:var(--tx); margin-bottom:5px; }
+    .sdesc  { font-size:12px; color:var(--tx2); line-height:1.55; }
+    .sdesc code { font-family:var(--mono); font-size:11px; background:var(--bg2); padding:1px 5px; border-radius:4px; color:#C0392B; }
+    .sdesc strong { font-weight:500; color:var(--tx); }
+
+    /* BLOCO CONCEITO */
+    .concept-box {
+      margin:10px 15px 0; padding:9px 12px;
+      background:var(--bg2); border-radius:var(--r); border:0.5px solid var(--bd);
+    }
+    .concept-title { font-size:10px; font-weight:500; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .concept-code { font-family:var(--mono); font-size:11px; color:var(--tx); line-height:1.65; white-space:pre-wrap; }
+    .concept-code .hl { color:#C0392B; font-weight:500; }
+    .concept-code .cm { color:var(--tx2); }
+
+    /* EDITOR */
+    .edwrap { flex:1; display:flex; flex-direction:column; min-height:0; }
+    textarea {
+      flex:1; width:100%; min-height:200px;
+      padding:13px; font-family:var(--mono); font-size:12.5px; line-height:1.65;
+      background:#0b1220; color:#dbeafe;
+      border:none; resize:none; outline:none; tab-size:2;
+    }
+
+    .edactions {
+      display:flex; gap:7px; padding:9px 13px;
+      border-top:0.5px solid var(--bd);
+      background:var(--bg2); align-items:center; flex-wrap:wrap;
+    }
+    .btn {
+      font-size:12px; font-weight:500; padding:5px 13px;
+      border-radius:var(--r); border:0.5px solid var(--bd2);
+      background:var(--bg); color:var(--tx);
+      cursor:pointer; transition:all .15s;
+      display:flex; align-items:center; gap:4px; font-family:var(--sans);
+    }
+    .btn:hover { background:var(--bg2); }
+    .btn.bp  { background:var(--blue);  border-color:var(--blue);  color:#E6F1FB; }
+    .btn.bp:hover  { background:var(--blue-dk); }
+    .btn.bdr { background:var(--red);   border-color:var(--red);   color:#FCEBEB; }
+    .btn.bdr:hover { background:#791F1F; }
+    .btn.bg  { background:var(--green); border-color:var(--green); color:#EAF3DE; }
+    .btn.bg:hover  { background:#27500A; }
+
+    .kbhint { margin-left:auto; font-size:10px; color:var(--tx2); }
+
+    /* MODAL */
+    .modal-overlay {
+      position:fixed; inset:0; background:rgba(0,0,0,0.55);
+      display:none; align-items:center; justify-content:center;
+      z-index:100; padding:16px;
+    }
+    .modal-overlay.aberto { display:flex; }
+    .modal-box {
+      width:min(640px,100%); background:var(--bg);
+      border:0.5px solid var(--bd2); border-radius:12px;
+      box-shadow:0 12px 36px rgba(0,0,0,0.24); overflow:hidden;
+    }
+    .modal-head {
+      display:flex; align-items:center; justify-content:space-between;
+      gap:10px; padding:10px 14px; border-bottom:0.5px solid var(--bd);
+      font-size:12px; font-weight:600; color:var(--tx);
+    }
+    .modal-actions { display:flex; align-items:center; gap:8px; }
+    .modal-code {
+      margin:0; padding:14px; background:#151524; color:#e0e0ff;
+      font-family:var(--mono); font-size:13px; line-height:1.6;
+      white-space:pre; overflow:auto; max-height:60vh;
+    }
+
+    /* FEEDBACK */
+    .fbbar {
+      padding:7px 13px; font-size:12px; min-height:32px;
+      border-top:0.5px solid var(--bd); display:flex; align-items:center; gap:6px;
+    }
+    .fbbar.ok   { color:var(--green); background:var(--green-lt); }
+    .fbbar.err  { color:var(--red);   background:var(--red-lt); }
+    .fbbar.idle { color:var(--tx2);   background:var(--bg2); }
+    .fbbar.hint { color:var(--blue);  background:var(--blue-lt); }
+    .fbbar.warn { color:var(--orange);background:var(--orange-lt); }
+
+    /* PREVIEW IFRAME */
+    .preview-wrap { flex:1; display:flex; flex-direction:column; min-height:0; }
+    .preview-header {
+      display:flex; align-items:center; gap:8px;
+      padding:6px 14px; border-bottom:0.5px solid var(--bd);
+      background:var(--bg2);
+    }
+    .preview-url {
+      flex:1; font-family:var(--mono); font-size:11px; color:var(--tx2);
+      background:var(--bg3); border:0.5px solid var(--bd);
+      border-radius:4px; padding:3px 8px;
+    }
+    .preview-badge {
+      font-size:10px; font-weight:500; padding:2px 8px; border-radius:99px;
+      background:var(--green-lt); color:var(--green); border:0.5px solid rgba(16,185,129,.45);
+    }
+    .preview-frame { flex:1; border:none; width:100%; min-height:280px; display:block; }
+
+    /* BOX MODEL VISUAL */
+    .boxmodel-section {
+      border-top:0.5px solid var(--bd); padding:10px 14px;
+    }
+    .boxmodel-title { font-size:10px; font-weight:500; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:8px; }
+    .bm-wrap {
+      display:flex; gap:14px; align-items:flex-start; flex-wrap:wrap;
+    }
+    .bm-diagram {
+      display:flex; flex-direction:column; gap:0; font-size:10px; font-family:var(--mono);
+      flex-shrink:0;
+    }
+    .bm-layer {
+      border-radius:4px; padding:4px 8px; text-align:center; font-size:10px; font-weight:500;
+      position:relative;
+    }
+    .bm-margin  { background:rgba(245,158,11,.14); border:1.5px dashed rgba(245,158,11,.7); color:#fbbf24; }
+    .bm-border  { background:rgba(59,130,246,.14); border:1.5px solid rgba(59,130,246,.8); color:#93c5fd; margin:3px; }
+    .bm-padding { background:rgba(16,185,129,.14); border:1.5px dashed rgba(16,185,129,.8); color:#6ee7b7; margin:3px; }
+    .bm-content { background:#0f172a; border:1.5px solid rgba(148,163,184,.65); color:#cbd5e1; margin:3px; min-width:80px; text-align:center; padding:6px 8px; border-radius:3px; }
+
+    .bm-sliders { flex:1; min-width:140px; }
+    .bm-row { display:flex; flex-direction:column; gap:2px; margin-bottom:8px; }
+    .bm-row-label {
+      display:flex; align-items:center; justify-content:space-between;
+      font-size:10px; font-weight:500;
+    }
+    .bm-row-label span:first-child { color:var(--tx2); }
+    .bm-row-label span:last-child  { font-family:var(--mono); color:var(--blue); }
+    input[type=range] {
+      width:100%; height:4px; border-radius:2px;
+      -webkit-appearance:none; appearance:none; cursor:pointer;
+      background:linear-gradient(to right, var(--blue) 0%, var(--blue) var(--pct,50%), var(--bd2) var(--pct,50%), var(--bd2) 100%);
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance:none; width:12px; height:12px; border-radius:50%;
+      background:var(--blue); border:2px solid var(--bg); box-shadow:0 0 0 1px var(--blue);
+    }
+    .bm-apply-btn {
+      margin-top:4px; font-size:11px; font-weight:500; padding:4px 10px;
+      border-radius:6px; border:0.5px solid var(--bd2);
+      background:var(--blue); color:#E6F1FB; cursor:pointer;
+      display:flex; align-items:center; gap:4px; font-family:var(--sans);
+    }
+    .bm-apply-btn:hover { background:var(--blue-dk); }
+
+    /* GUIA */
+    .guide-wrap { border-top:0.5px solid var(--bd); }
+    .guide-toggle { cursor:pointer; }
+    .ginner { padding:8px 14px; }
+    .ptable { width:100%; border-collapse:collapse; font-size:11px; }
+    .ptable th { text-align:left; color:var(--tx2); font-weight:500; padding:3px 5px; border-bottom:0.5px solid var(--bd); }
+    .ptable td { padding:3px 5px; color:var(--tx); vertical-align:top; }
+    .ptable td:first-child { font-family:var(--mono); font-size:10.5px; color:#f59e0b; white-space:nowrap; }
+    .ptable td:last-child  { color:var(--tx2); font-size:10.5px; }
+
+    /* NAV */
+    .navrow {
+      display:flex; gap:7px; padding:9px 13px;
+      border-top:0.5px solid var(--bd); background:var(--bg2); align-items:center;
+    }
+    .navlabel { font-size:11px; color:var(--tx2); flex:1; }
+    .complete-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:500; padding:3px 9px; border-radius:99px;
+      background:var(--green-lt); color:var(--green); border:0.5px solid rgba(16,185,129,.45);
+    }
+
+    /* CONQUISTA */
+    .conquest { display:none; padding:14px 16px; background:var(--green-lt); border-top:0.5px solid rgba(16,185,129,.45); font-size:13px; color:var(--green); font-weight:500; text-align:center; }
+    .conquest.show { display:block; }
+
+    @media (max-width:620px) {
+      .body { grid-template-columns:1fr; }
+      .lpanel { border-right:none; border-bottom:0.5px solid var(--bd); }
+      .kbhint { display:none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html" class="back-btn">← Voltar</a>
+      <span class="topbar-pill">AULA 06</span>
+    </div>
+    <div class="topbar-right">
+      <span>css-quadradro-margin-padding-interativo.html</span>
+      <div class="pills" id="pills"></div>
+    </div>
+  </div>
+  <div class="progbar"><div class="progfill" id="progfill" style="width:50%"></div></div>
+
+  <div class="body">
+
+    <!-- ESQUERDO -->
+    <div class="lpanel">
+      <div class="phdr"><i class="ti ti-terminal"></i> editor css</div>
+
+      <div class="stepcard">
+        <div class="slabel" id="slabel">Etapa 1 de 2</div>
+        <div class="stitle" id="stitle">O quadrado e o Box Model</div>
+        <div class="sdesc"  id="sdesc"></div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-title">estrutura real do browser</div>
+        <pre class="concept-code" id="concept-code"></pre>
+      </div>
+
+      <div class="edwrap">
+        <textarea id="editor" spellcheck="false" autocomplete="off"></textarea>
+      </div>
+
+      <div class="edactions">
+        <button class="btn bp"  onclick="aplicar()"><i class="ti ti-player-play"></i> Aplicar</button>
+        <button class="btn"     onclick="abrirModalCodigo()"><i class="ti ti-code"></i> Código</button>
+        <button class="btn"     onclick="dica()"><i class="ti ti-bulb"></i> Dica</button>
+        <button class="btn bdr" onclick="resetar()"><i class="ti ti-refresh"></i> Reset</button>
+        <span class="kbhint">Ctrl+Enter aplica</span>
+      </div>
+      <div class="fbbar idle" id="fbbar">
+        <i class="ti ti-info-circle"></i>
+        <span>Escreva o CSS e clique em Aplicar.</span>
+      </div>
+    </div>
+
+    <!-- DIREITO -->
+    <div class="rpanel">
+      <div class="preview-header">
+        <i class="ti ti-world" style="font-size:13px;color:var(--tx2)"></i>
+        <span class="preview-url">minha-pagina.html</span>
+        <span class="preview-badge">iframe real</span>
+      </div>
+
+      <div class="preview-wrap">
+        <iframe id="preview-frame" class="preview-frame"></iframe>
+
+        <!-- BOX MODEL VISUAL INTERATIVO -->
+        <div class="boxmodel-section" id="bm-section" style="display:none">
+          <div class="boxmodel-title">explore o box model — arraste os controles</div>
+          <div class="bm-wrap">
+            <div>
+              <div class="bm-diagram" id="bm-diagram">
+                <div class="bm-layer bm-margin">margin
+                  <div class="bm-layer bm-border">border
+                    <div class="bm-layer bm-padding">padding
+                      <div class="bm-layer bm-content" id="bm-content">conteúdo</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="bm-sliders">
+              <div class="bm-row">
+                <div class="bm-row-label">
+                  <span>padding</span>
+                  <span id="lbl-padding">16px</span>
+                </div>
+                <input type="range" id="sl-padding" min="0" max="40" value="16"
+                  oninput="atualizarSlider(this,'lbl-padding','px')">
+              </div>
+              <div class="bm-row">
+                <div class="bm-row-label">
+                  <span>border-width</span>
+                  <span id="lbl-border">3px</span>
+                </div>
+                <input type="range" id="sl-border" min="0" max="16" value="3"
+                  oninput="atualizarSlider(this,'lbl-border','px')">
+              </div>
+              <div class="bm-row">
+                <div class="bm-row-label">
+                  <span>margin</span>
+                  <span id="lbl-margin">20px</span>
+                </div>
+                <input type="range" id="sl-margin" min="0" max="60" value="20"
+                  oninput="atualizarSlider(this,'lbl-margin','px')">
+              </div>
+              <button class="bm-apply-btn" onclick="aplicarSliders()">
+                <i class="ti ti-wand"></i> Gerar CSS e Aplicar
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-wrap">
+        <div class="phdr guide-toggle" onclick="toggleGuide()">
+          <i class="ti ti-list"></i> propriedades desta etapa
+          <i class="ti ti-chevron-down" id="gchev" style="margin-left:auto;font-size:11px;transition:transform .2s"></i>
+        </div>
+        <div class="ginner" id="ginner">
+          <table class="ptable">
+            <thead><tr><th>propriedade</th><th>o que faz</th><th>exemplo</th></tr></thead>
+            <tbody id="ptbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="navrow">
+        <button class="btn" onclick="anterior()" id="btnprev" style="display:none">
+          <i class="ti ti-arrow-left"></i> Anterior
+        </button>
+        <span class="navlabel" id="navlabel"></span>
+        <button class="btn bg" id="btnnext" onclick="proximo()">
+          Próxima etapa <i class="ti ti-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="conquest" id="conquest">
+    <i class="ti ti-trophy"></i> Parabéns! Você entendeu o Box Model! Agora padding, border e margin fazem parte do seu vocabulário CSS.
+  </div>
+</div>
+
+<div class="modal-overlay" id="codigo-modal" onclick="fecharModalCodigo(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="codigo-modal-titulo">
+    <div class="modal-head">
+      <span id="codigo-modal-titulo">Código da etapa</span>
+      <div class="modal-actions">
+        <button class="btn" type="button" onclick="copiarCodigoModal()">
+          <i class="ti ti-copy"></i> Copiar
+        </button>
+        <button class="btn" type="button" onclick="fecharModalCodigo()">
+          <i class="ti ti-x"></i> Fechar
+        </button>
+      </div>
+    </div>
+    <pre class="modal-code" id="codigo-modal-conteudo"></pre>
+  </div>
+</div>
+
+<script>
+const E = [
+  {
+    label:'Etapa 1 de 2', titulo:'O quadrado e o Box Model',
+    desc:'Todo elemento HTML é uma <strong>caixa</strong>. Essa caixa tem 4 camadas: <code>content</code> (conteúdo), <code>padding</code> (espaço interno), <code>border</code> (borda) e <code>margin</code> (espaço externo). Use os controles abaixo do preview para experimentar ao vivo!',
+    conceito:`/* Todo elemento é uma caixa com 4 camadas: */
+.meubox {
+  width: 120px;      /* largura do CONTEÚDO */
+  height: 120px;     /* altura do CONTEÚDO */
+  padding: 16px;     /* espaço INTERNO (entre conteúdo e borda) */
+  border: 3px solid; /* a BORDA em volta do padding */
+  margin: 20px;      /* espaço EXTERNO (entre a borda e os outros) */
+}
+/* Tamanho total = width + padding×2 + border×2 + margin×2 */`,
+    css:`body {
+  margin: 24px;
+  background-color: #f0f4f8;
+  font-family: sans-serif;
+}
+
+.meubox {
+  width: 120px;
+  height: 120px;
+  background-color: #3498db;
+  padding: 16px;
+  border: 3px solid #1a6fa0;
+  margin: 20px;
+}`,
+    props:[
+      ['width / height','Tamanho do CONTEÚDO','120px, 50%, auto'],
+      ['padding','Espaço INTERNO (conteúdo → borda)','16px, 8px 16px'],
+      ['border','A borda ao redor do padding','3px solid #333'],
+      ['margin','Espaço EXTERNO (borda → vizinhos)','20px, 0 auto'],
+      ['box-sizing: border-box','Inclui padding+border no width','boa prática sempre usar'],
+    ],
+    dicas:[
+      'Use os sliders abaixo do preview para ver padding, border e margin mudando ao vivo!',
+      'padding aumenta o espaço DENTRO do box. O box fica maior, mas a cor de fundo preenche.',
+      'border é a linha ao redor. Tente: border: 5px dashed tomato',
+      'margin é o espaço FORA do box — empurra os outros elementos para longe.',
+      'box-sizing:border-box faz o width incluir padding e border — muito útil!',
+      'Tente margin:0 auto para centralizar horizontalmente (com width definido).',
+    ],
+    boxmodel: true
+  },
+  {
+    label:'Etapa 2 de 2', titulo:'Box Model com texto real',
+    desc:'O box model se aplica a <strong>qualquer elemento</strong>, incluindo caixas com texto. O <code>padding</code> cria espaço entre o texto e a borda. A <code>margin</code> afasta o elemento dos vizinhos. Veja o exemplo de um cartão com título e parágrafo.',
+    conceito:`/* Box model em prática: um cartão com texto */
+.card {
+  padding: 20px;          /* espaço confortável ao redor do texto */
+  border: 1px solid #ddd; /* borda sutil */
+  margin: 16px;           /* afasta dos outros cards */
+  border-radius: 8px;     /* cantos arredondados */
+}
+p {
+  margin-top: 8px;  /* margin entre h2 e p */
+  line-height: 1.6; /* espaço entre linhas */
+}`,
+    css:`body {
+  margin: 0;
+  padding: 24px;
+  background-color: #f0f4f8;
+  font-family: sans-serif;
+}
+
+h2 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  color: #1a1a18;
+}
+
+p {
+  margin: 0;
+  font-size: 13px;
+  color: #5f5e5a;
+  line-height: 1.6;
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 20px;
+  border: 1px solid #d0d0cc;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  max-width: 340px;
+}
+
+.card.destaque {
+  border-color: #3498db;
+  border-width: 2px;
+  padding: 20px;
+}`,
+    props:[
+      ['padding','Espaço interno — respira o texto','20px, 12px 20px'],
+      ['margin','Espaço externo — afasta vizinhos','16px, 0 0 12px 0'],
+      ['border-radius','Arredonda os cantos','8px, 50% (círculo)'],
+      ['line-height','Espaço entre linhas do texto','1.5, 1.6, 24px'],
+      ['max-width','Largura máxima do card','340px, 100%'],
+      ['margin: 0 auto','Centraliza horizontalmente','precisa de width ou max-width'],
+    ],
+    dicas:[
+      'padding:20px dá conforto ao texto dentro do card — experimente 8px e veja como fica apertado.',
+      'border-radius:8px deixa os cantos arredondados. Tente 0 para cantos retos ou 50% em elementos quadrados.',
+      'margin-bottom:12px entre os cards cria espaço entre eles. Sem isso eles ficam colados.',
+      'line-height:1.6 melhora a leitura do texto. O padrão do browser (1.2) é muito comprimido.',
+      'Tente mudar a cor da border do card .destaque para vermelho: border-color: tomato',
+      'max-width:340px evita que o card fique largo demais em telas grandes.',
+    ],
+    boxmodel: false
+  }
+];
+
+let etapa = 0, dicaI = 0, guideOpen = true;
+const done = new Set();
+const editor = document.getElementById('editor');
+const frame  = document.getElementById('preview-frame');
+
+/* ── iframe ── */
+function iframeHTML(css, etapaIdx) {
+  const body2 = etapaIdx === 1
+    ? `<div class="card"><h2>Aprender CSS</h2><p>O box model é a base de todo layout. Com padding, border e margin você controla o espaço ao redor de qualquer elemento.</p></div><div class="card destaque"><h2>Box Model</h2><p>Conteúdo → Padding → Border → Margin. Cada camada tem seu papel no espaçamento da página.</p></div>`
+    : `<div class="meubox"></div>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*,*::before,*::after{box-sizing:border-box;}${css}</style></head><body>${body2}</body></html>`;
+}
+
+function aplicar(silente) {
+  frame.srcdoc = iframeHTML(editor.value, etapa);
+  if (!silente) fb('ok','ti-check','CSS aplicado com sucesso!');
+}
+
+function resetar() {
+  editor.value = E[etapa].css;
+  aplicar(true);
+  sincronizarSliders();
+  fb('idle','ti-refresh','CSS restaurado para o exemplo da etapa.');
+}
+
+function dica() {
+  const ds = E[etapa].dicas;
+  fb('hint','ti-bulb', ds[dicaI % ds.length]);
+  dicaI++;
+}
+
+/* ── modal ── */
+function abrirModalCodigo() {
+  const e = E[etapa];
+  document.getElementById('codigo-modal-titulo').textContent = `Código da ${e.label}`;
+  document.getElementById('codigo-modal-conteudo').textContent = e.css;
+  document.getElementById('codigo-modal').classList.add('aberto');
+}
+function fecharModalCodigo(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('codigo-modal').classList.remove('aberto');
+}
+function copiarCodigoModal() {
+  navigator.clipboard.writeText(document.getElementById('codigo-modal-conteudo').textContent)
+    .then(() => fb('ok','ti-copy','Código copiado!'))
+    .catch(() => fb('err','ti-alert-circle','Não foi possível copiar.'));
+}
+
+function fb(tipo, icon, msg) {
+  const bar = document.getElementById('fbbar');
+  bar.className = 'fbbar ' + tipo;
+  bar.innerHTML = `<i class="ti ${icon}"></i> <span>${msg}</span>`;
+}
+
+/* ── pills ── */
+function pills() {
+  const w = document.getElementById('pills');
+  w.innerHTML = '';
+  E.forEach((_,i) => {
+    const b = document.createElement('button');
+    b.className = 'pill'+(i===etapa?' active':'')+(done.has(i)&&i!==etapa?' done':'');
+    b.textContent = i+1; b.title = E[i].titulo;
+    b.onclick = () => ir(i);
+    w.appendChild(b);
+  });
+}
+
+/* ── prop table ── */
+function propTable() {
+  const tb = document.getElementById('ptbody');
+  tb.innerHTML = '';
+  E[etapa].props.forEach(([p,d,ex]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${p}</td><td>${d}</td><td>${ex}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+/* ── sliders do box model ── */
+function atualizarSlider(input, labelId, unit) {
+  document.getElementById(labelId).textContent = input.value + unit;
+  const pct = ((input.value - input.min) / (input.max - input.min) * 100).toFixed(1);
+  input.style.setProperty('--pct', pct + '%');
+}
+
+function sincronizarSliders() {
+  ['padding','border','margin'].forEach(p => {
+    const sl = document.getElementById('sl-'+p);
+    const lbl = 'lbl-'+p;
+    const unit = 'px';
+    document.getElementById(lbl).textContent = sl.value + unit;
+    const pct = ((sl.value - sl.min) / (sl.max - sl.min) * 100).toFixed(1);
+    sl.style.setProperty('--pct', pct + '%');
+  });
+}
+
+function aplicarSliders() {
+  const p  = document.getElementById('sl-padding').value;
+  const bw = document.getElementById('sl-border').value;
+  const m  = document.getElementById('sl-margin').value;
+  editor.value = `body {
+  margin: 24px;
+  background-color: #f0f4f8;
+  font-family: sans-serif;
+}
+
+.meubox {
+  width: 120px;
+  height: 120px;
+  background-color: #3498db;
+  padding: ${p}px;
+  border: ${bw}px solid #1a6fa0;
+  margin: ${m}px;
+}`;
+  aplicar(true);
+  fb('hint','ti-wand',`padding:${p}px · border:${bw}px · margin:${m}px aplicados!`);
+}
+
+/* ── load etapa ── */
+function load(idx) {
+  const e = E[idx];
+  document.getElementById('slabel').textContent = e.label;
+  document.getElementById('stitle').textContent = e.titulo;
+  document.getElementById('sdesc').innerHTML  = e.desc;
+  document.getElementById('concept-code').innerHTML = e.conceito;
+  editor.value = idx < 2 ? '' : e.css;
+  dicaI = 0;
+  propTable();
+
+  // box model section
+  document.getElementById('bm-section').style.display = e.boxmodel ? '' : 'none';
+  sincronizarSliders();
+
+  aplicar(true);
+  document.getElementById('progfill').style.width = ((idx+1)/E.length*100)+'%';
+  document.getElementById('btnprev').style.display = idx===0 ? 'none' : '';
+
+  const nb = document.getElementById('btnnext');
+  if (idx === E.length-1) {
+    nb.innerHTML = '<i class="ti ti-check"></i> Concluir!';
+    nb.onclick = concluir;
+  } else {
+    nb.innerHTML = 'Próxima etapa <i class="ti ti-arrow-right"></i>';
+    nb.onclick = proximo;
+  }
+  document.getElementById('navlabel').innerHTML = idx < E.length-1
+    ? `<span style="font-size:11px;color:var(--tx2)">Etapa ${idx+1} de ${E.length}</span>`
+    : `<span class="complete-badge"><i class="ti ti-star"></i> Última etapa!</span>`;
+
+  fb('idle','ti-info-circle','Edite o CSS e clique em Aplicar. Use a Dica se precisar.');
+  pills();
+}
+
+function ir(idx)    { etapa=idx; load(idx); }
+function proximo()  { done.add(etapa); if(etapa<E.length-1){etapa++;load(etapa);} }
+function anterior() { if(etapa>0){etapa--;load(etapa);} }
+function concluir() { done.add(etapa); pills(); document.getElementById('conquest').classList.add('show'); fb('ok','ti-trophy','Parabéns! Box Model dominado!'); }
+
+function toggleGuide() {
+  guideOpen = !guideOpen;
+  document.getElementById('ginner').style.display = guideOpen ? '' : 'none';
+  document.getElementById('gchev').style.transform = guideOpen ? '' : 'rotate(-90deg)';
+}
+
+/* ── teclado ── */
+editor.addEventListener('keydown', ev => {
+  if (ev.ctrlKey && ev.key==='Enter') { ev.preventDefault(); aplicar(); }
+  if (ev.key==='Escape') fecharModalCodigo();
+  if (ev.key==='Tab') {
+    ev.preventDefault();
+    const s = editor.selectionStart;
+    editor.value = editor.value.substring(0,s)+'  '+editor.value.substring(editor.selectionEnd);
+    editor.selectionStart = editor.selectionEnd = s+2;
+  }
+});
+
+/* init */
+sincronizarSliders();
+load(0);
+</script>
+</body>
+</html>

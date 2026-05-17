@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CSS Posicionamento — Interativo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Sora:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg:      #1e293b;
+      --bg2:     #1a2744;
+      --bg3:     #0f172a;
+      --tx:      #f8fafc;
+      --tx2:     #94a3b8;
+      --bd:      rgba(148,163,184,0.22);
+      --bd2:     rgba(148,163,184,0.38);
+      --blue:    #3b82f6;
+      --blue-lt: rgba(59,130,246,0.14);
+      --blue-dk: #2563eb;
+      --green:   #10b981;
+      --green-lt:rgba(16,185,129,0.14);
+      --red:     #ef4444;
+      --red-lt:  rgba(239,68,68,0.14);
+      --mono:    'Space Mono', monospace;
+      --sans:    'Sora', system-ui, -apple-system, sans-serif;
+      --r:       8px;
+    }
+
+    html { height:100%; scroll-behavior:smooth; }
+    body {
+      min-height:100%;
+      font-family:var(--sans);
+      background:var(--bg3);
+      color:var(--tx);
+      overflow-x:hidden;
+      position:relative;
+    }
+    body::before {
+      content:'';
+      position:fixed;
+      inset:0;
+      background-image:
+        linear-gradient(rgba(59,130,246,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(59,130,246,.07) 1px, transparent 1px);
+      background-size:48px 48px;
+      pointer-events:none;
+      z-index:0;
+    }
+
+    .app {
+      max-width:960px; margin:0 auto;
+      background:var(--bg); min-height:100vh;
+      display:flex; flex-direction:column;
+      border-left:0.5px solid var(--bd); border-right:0.5px solid var(--bd);
+      position:relative;
+      z-index:1;
+      box-shadow:0 24px 60px rgba(0,0,0,.35);
+    }
+
+    /* TOP BAR */
+    .topbar {
+      display:flex; align-items:center; gap:12px;
+      padding:11px 16px; border-bottom:0.5px solid var(--bd);
+      background:var(--bg); position:sticky; top:0; z-index:20;
+      justify-content:space-between;
+    }
+    .topbar-left { display:flex; align-items:center; gap:10px; }
+    .topbar-right { display:flex; align-items:center; gap:10px; color:var(--tx2); font-size:12px; }
+    .back-btn {
+      text-decoration:none;
+      color:var(--tx);
+      border:0.5px solid var(--bd2);
+      background:var(--bg2);
+      border-radius:99px;
+      padding:5px 10px;
+      font-size:12px;
+      font-weight:600;
+      transition:all .15s;
+    }
+    .back-btn:hover { border-color:var(--blue); color:var(--tx); background:var(--blue-lt); }
+    .topbar-pill {
+      font-family:var(--mono);
+      font-size:11px;
+      letter-spacing:.06em;
+      padding:4px 10px;
+      border-radius:99px;
+      border:0.5px solid rgba(59,130,246,.45);
+      background:rgba(59,130,246,.12);
+      color:#93c5fd;
+      font-weight:700;
+    }
+
+    .pills { display:flex; gap:5px; }
+    .pill {
+      width:26px; height:26px; border-radius:50%;
+      border:0.5px solid var(--bd2); background:var(--bg2);
+      color:var(--tx2); font-size:11px; font-weight:500;
+      cursor:pointer; display:flex; align-items:center; justify-content:center;
+      transition:all .15s; font-family:var(--sans);
+    }
+    .pill.active { background:var(--blue); border-color:var(--blue); color:#E6F1FB; }
+    .pill.done   { background:var(--green); border-color:var(--green); color:#EAF3DE; }
+
+    .progbar { height:3px; background:var(--bd); }
+    .progfill { height:100%; background:var(--blue); transition:width .4s ease; border-radius:1px; }
+
+    /* GRID PRINCIPAL */
+    .body { display:grid; grid-template-columns:1fr 1fr; flex:1; min-height:0; }
+    .lpanel { border-right:0.5px solid var(--bd); display:flex; flex-direction:column; }
+    .rpanel { display:flex; flex-direction:column; }
+
+    .phdr {
+      padding:9px 14px; border-bottom:0.5px solid var(--bd);
+      font-size:11px; font-weight:500; color:var(--tx2);
+      text-transform:uppercase; letter-spacing:.06em;
+      display:flex; align-items:center; gap:7px;
+    }
+    .phdr .ti { font-size:13px; }
+
+    /* STEP CARD */
+    .stepcard { padding:13px 15px; border-bottom:0.5px solid var(--bd); }
+    .slabel { font-size:11px; font-weight:500; color:var(--blue); text-transform:uppercase; letter-spacing:.05em; margin-bottom:3px; }
+    .stitle { font-size:14px; font-weight:500; color:var(--tx); margin-bottom:5px; }
+    .sdesc  { font-size:12px; color:var(--tx2); line-height:1.55; }
+    .sdesc code { font-family:var(--mono); font-size:11px; background:var(--bg2); padding:1px 5px; border-radius:4px; color:#C0392B; }
+    .sdesc strong { font-weight:500; color:var(--tx); }
+
+    /* BLOCO CONCEITO */
+    .concept-box {
+      margin:10px 15px 0; padding:9px 12px;
+      background:var(--bg2); border-radius:var(--r); border:0.5px solid var(--bd);
+    }
+    .concept-title { font-size:10px; font-weight:500; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:6px; }
+    .concept-code { font-family:var(--mono); font-size:11px; color:var(--tx); line-height:1.65; white-space:pre-wrap; }
+    .concept-code .hl { color:#C0392B; font-weight:500; }
+    .concept-code .cm { color:var(--tx2); }
+
+    /* EDITOR */
+    .edwrap { flex:1; display:flex; flex-direction:column; min-height:0; }
+    textarea {
+      flex:1; width:100%; min-height:200px;
+      padding:13px; font-family:var(--mono); font-size:12.5px; line-height:1.65;
+      background:#0b1220; color:#dbeafe;
+      border:none; resize:none; outline:none; tab-size:2;
+    }
+
+    .edactions {
+      display:flex; gap:7px; padding:9px 13px;
+      border-top:0.5px solid var(--bd);
+      background:var(--bg2); align-items:center; flex-wrap:wrap;
+    }
+    .btn {
+      font-size:12px; font-weight:500; padding:5px 13px;
+      border-radius:var(--r); border:0.5px solid var(--bd2);
+      background:var(--bg); color:var(--tx);
+      cursor:pointer; transition:all .15s;
+      display:flex; align-items:center; gap:4px; font-family:var(--sans);
+    }
+    .btn:hover { background:var(--bg2); }
+    .btn.bp  { background:var(--blue);  border-color:var(--blue);  color:#E6F1FB; }
+    .btn.bp:hover  { background:var(--blue-dk); }
+    .btn.bdr { background:var(--red);   border-color:var(--red);   color:#FCEBEB; }
+    .btn.bdr:hover { background:#791F1F; }
+    .btn.bg  { background:var(--green); border-color:var(--green); color:#EAF3DE; }
+    .btn.bg:hover  { background:#27500A; }
+    .kbhint { margin-left:auto; font-size:10px; color:var(--tx2); }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 16px;
+    }
+    .modal-overlay.aberto { display: flex; }
+    .modal-box {
+      width: min(640px, 100%);
+      background: var(--bg);
+      border: 0.5px solid var(--bd2);
+      border-radius: 12px;
+      box-shadow: 0 12px 36px rgba(0,0,0,0.24);
+      overflow: hidden;
+    }
+    .modal-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      border-bottom: 0.5px solid var(--bd);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--tx);
+    }
+    .modal-actions { display:flex; align-items:center; gap:8px; }
+    .modal-code {
+      margin: 0;
+      padding: 14px;
+      background: #0b1220;
+      color: #dbeafe;
+      font-family: var(--mono);
+      font-size: 13px;
+      line-height: 1.6;
+      white-space: pre;
+      overflow: auto;
+      max-height: 60vh;
+    }
+
+    /* FEEDBACK */
+    .fbbar {
+      padding:7px 13px; font-size:12px; min-height:32px;
+      border-top:0.5px solid var(--bd); display:flex; align-items:center; gap:6px;
+    }
+    .fbbar.ok   { color:var(--green); background:var(--green-lt); }
+    .fbbar.err  { color:var(--red);   background:var(--red-lt); }
+    .fbbar.idle { color:var(--tx2);   background:var(--bg2); }
+    .fbbar.hint { color:var(--blue);  background:var(--blue-lt); }
+
+    /* PREVIEW IFRAME */
+    .preview-wrap { flex:1; display:flex; flex-direction:column; min-height:0; }
+    .preview-header {
+      display:flex; align-items:center; gap:8px;
+      padding:6px 14px; border-bottom:0.5px solid var(--bd);
+      background:var(--bg2);
+    }
+    .preview-url {
+      flex:1; font-family:var(--mono); font-size:11px; color:var(--tx2);
+      background:var(--bg3); border:0.5px solid var(--bd);
+      border-radius:4px; padding:3px 8px;
+    }
+    .preview-badge {
+      font-size:10px; font-weight:500; padding:2px 8px; border-radius:99px;
+      background:var(--green-lt); color:var(--green); border:0.5px solid rgba(16,185,129,.45);
+    }
+    .preview-frame { flex:1; border:none; width:100%; min-height:280px; display:block; }
+
+    /* MAPA 9 PONTOS */
+    .posmap-section {
+      border-top:0.5px solid var(--bd); padding:10px 14px;
+      display:flex; align-items:flex-start; gap:14px;
+    }
+    .posmap-title { font-size:10px; font-weight:500; color:var(--tx2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:7px; }
+    .posmap { display:grid; grid-template-columns:repeat(3,1fr); gap:4px; width:96px; }
+    .posmap-cell {
+      height:28px; border-radius:4px; border:0.5px solid var(--bd2);
+      background:var(--bg2); cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+      font-size:13px; transition:all .15s;
+    }
+    .posmap-cell:hover { background:var(--blue-lt); border-color:var(--blue); }
+    .posmap-cell.sel   { background:var(--blue); border-color:var(--blue); }
+    .posmap-info { flex:1; font-size:11px; color:var(--tx2); line-height:1.7; }
+    .posmap-info strong { display:block; color:var(--tx); font-weight:500; margin-bottom:3px; }
+    .posmap-info code   { font-family:var(--mono); font-size:10px; color:#f59e0b; display:block; }
+
+    /* GUIA */
+    .guide-wrap { border-top:0.5px solid var(--bd); }
+    .guide-toggle { cursor:pointer; }
+    .ginner { padding:8px 14px; }
+    .ptable { width:100%; border-collapse:collapse; font-size:11px; }
+    .ptable th { text-align:left; color:var(--tx2); font-weight:500; padding:3px 5px; border-bottom:0.5px solid var(--bd); }
+    .ptable td { padding:3px 5px; color:var(--tx); vertical-align:top; }
+    .ptable td:first-child { font-family:var(--mono); font-size:10.5px; color:#f59e0b; white-space:nowrap; }
+    .ptable td:last-child  { color:var(--tx2); font-size:10.5px; }
+
+    /* NAV */
+    .navrow {
+      display:flex; gap:7px; padding:9px 13px;
+      border-top:0.5px solid var(--bd); background:var(--bg2); align-items:center;
+    }
+    .navlabel { font-size:11px; color:var(--tx2); flex:1; }
+    .complete-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      font-size:11px; font-weight:500; padding:3px 9px; border-radius:99px;
+      background:var(--green-lt); color:var(--green); border:0.5px solid rgba(16,185,129,.45);
+    }
+
+    /* CONQUISTA */
+    .conquest { display:none; padding:14px 16px; background:var(--green-lt); border-top:0.5px solid rgba(16,185,129,.45); font-size:13px; color:var(--green); font-weight:500; text-align:center; }
+    .conquest.show { display:block; }
+
+    input[type=range] {
+      appearance:none;
+    }
+
+    @media (max-width:620px) {
+      .body { grid-template-columns:1fr; }
+      .lpanel { border-right:none; border-bottom:0.5px solid var(--bd); }
+      .kbhint { display:none; }
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <div class="topbar">
+    <div class="topbar-left">
+      <a href="../index.html" class="back-btn">← Voltar</a>
+      <span class="topbar-pill">AULA 07</span>
+    </div>
+    <div class="topbar-right">
+      <span>css-posicionamento-interativo.html</span>
+      <div class="pills" id="pills"></div>
+    </div>
+  </div>
+  <div class="progbar"><div class="progfill" id="progfill" style="width:16.6%"></div></div>
+
+  <div class="body">
+
+    <!-- ESQUERDO -->
+    <div class="lpanel">
+      <div class="phdr"><i class="ti ti-terminal"></i> editor css</div>
+
+      <div class="stepcard">
+        <div class="slabel" id="slabel">Etapa 1 de 6</div>
+        <div class="stitle" id="stitle">Criar o quadrado</div>
+        <div class="sdesc"  id="sdesc"></div>
+      </div>
+
+      <div class="concept-box">
+        <div class="concept-title">estrutura real do browser</div>
+        <pre class="concept-code" id="concept-code"></pre>
+      </div>
+
+      <div class="edwrap">
+        <textarea id="editor" spellcheck="false" autocomplete="off"></textarea>
+      </div>
+
+      <div class="edactions">
+        <button class="btn bp"  onclick="aplicar()"><i class="ti ti-player-play"></i> Aplicar</button>
+        <button class="btn"     onclick="abrirModalCodigo()"><i class="ti ti-code"></i> Código</button>
+        <button class="btn"     onclick="dica()"><i class="ti ti-bulb"></i> Dica</button>
+        <button class="btn bdr" onclick="resetar()"><i class="ti ti-refresh"></i> Reset</button>
+        <span class="kbhint">Ctrl+Enter aplica</span>
+      </div>
+      <div class="fbbar idle" id="fbbar">
+        <i class="ti ti-info-circle"></i>
+        <span>Escreva o CSS e clique em Aplicar.</span>
+      </div>
+    </div>
+
+    <!-- DIREITO -->
+    <div class="rpanel">
+      <div class="preview-header">
+        <i class="ti ti-world" style="font-size:13px;color:var(--tx2)"></i>
+        <span class="preview-url">minha-pagina.html</span>
+        <span class="preview-badge">iframe real</span>
+      </div>
+
+      <div class="preview-wrap">
+        <iframe id="preview-frame" class="preview-frame"></iframe>
+
+        <div class="posmap-section" id="posmap-section" style="display:none">
+          <div>
+            <div class="posmap-title">clique para posicionar</div>
+            <div class="posmap" id="posmap"></div>
+          </div>
+          <div class="posmap-info" id="posmap-info">
+            <strong>selecione um ponto</strong>
+            Clique em uma posição no mapa para gerar o CSS automaticamente e ver o resultado ao vivo.
+          </div>
+        </div>
+      </div>
+
+      <div class="guide-wrap">
+        <div class="phdr guide-toggle" onclick="toggleGuide()">
+          <i class="ti ti-list"></i> propriedades desta etapa
+          <i class="ti ti-chevron-down" id="gchev" style="margin-left:auto;font-size:11px;transition:transform .2s"></i>
+        </div>
+        <div class="ginner" id="ginner">
+          <table class="ptable">
+            <thead><tr><th>propriedade</th><th>o que faz</th><th>exemplo</th></tr></thead>
+            <tbody id="ptbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="navrow">
+        <button class="btn" onclick="anterior()" id="btnprev" style="display:none">
+          <i class="ti ti-arrow-left"></i> Anterior
+        </button>
+        <span class="navlabel" id="navlabel"></span>
+        <button class="btn bg" id="btnnext" onclick="proximo()">
+          Próxima etapa <i class="ti ti-arrow-right"></i>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="conquest" id="conquest">
+    <i class="ti ti-trophy"></i> Parabéns! Você dominou o posicionamento CSS. Agora use esses conceitos nos seus projetos reais!
+  </div>
+</div>
+
+<div class="modal-overlay" id="codigo-modal" onclick="fecharModalCodigo(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="codigo-modal-titulo">
+    <div class="modal-head">
+      <span id="codigo-modal-titulo">Código da etapa</span>
+      <div class="modal-actions">
+        <button class="btn" type="button" onclick="copiarCodigoModal()">
+          <i class="ti ti-copy"></i> Copiar
+        </button>
+        <button class="btn" type="button" onclick="fecharModalCodigo()">
+          <i class="ti ti-x"></i> Fechar
+        </button>
+      </div>
+    </div>
+    <pre class="modal-code" id="codigo-modal-conteudo"></pre>
+  </div>
+</div>
+
+<script>
+const E = [
+  {
+    label:'Etapa 1 de 6', titulo:'Criar o quadrado',
+    desc:'Use <code>width</code> e <code>height</code> com valores iguais. O elemento aparece no canto superior esquerdo — esse é o <strong>fluxo normal</strong> do browser quando nenhum posicionamento é definido.',
+    conceito:`body {            /* container da página */
+  margin: 8px;    /* padrão do browser */
+  background: #f5f5f5;
+}
+.meubox {         /* seu elemento */
+  width: 100px;
+  height: 100px;
+  background-color: #3498db;
+}`,
+    css:`body {
+  margin: 8px;
+  background-color: #f0f4f8;
+}
+
+.meubox {
+  width: 100px;
+  height: 100px;
+  background-color: #3498db;
+  color: white;
+  font-size: 13px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}`,
+    props:[
+      ['width','Largura do elemento','100px, 50%, auto'],
+      ['height','Altura do elemento','100px, auto'],
+      ['background-color','Cor de fundo','#3498db, tomato'],
+      ['margin (body)','Espaço externo do body','8px é o padrão do browser'],
+    ],
+    dicas:[
+      'width e height iguais fazem um quadrado. Tente 80px ou 150px.',
+      'Sem posicionamento, o box aparece no topo esquerdo — fluxo normal do HTML.',
+      'Mude background-color: tente tomato, #9b59b6 ou #2ecc71.',
+      'O body tem margin:8px por padrão no browser — tente margin:0 e veja o box encostar na borda.',
+    ],
+    posmap: false
+  },
+  {
+    label:'Etapa 2 de 6', titulo:'Centralizar na tela',
+    desc:'Para centralizar <strong>horizontal e verticalmente</strong>, transforme o <code>body</code> em um container flex. O <code>body</code> precisa ter <code>height:100vh</code> para ocupar a tela toda.',
+    conceito:`body {
+  display: flex;           /* ativa flexbox */
+  justify-content: center; /* eixo ↔ */
+  align-items: center;     /* eixo ↕ */
+  height: 100vh;           /* body = altura da tela */
+  margin: 0;
+}`,
+    css:`body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f4f8;
+}
+
+.meubox {
+  width: 100px;
+  height: 100px;
+  background-color: #8e44ad;
+  color: white;
+  font-size: 13px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}`,
+    props:[
+      ['display: flex','Ativa Flexbox no body','transforma o body em container'],
+      ['justify-content','Eixo horizontal ↔','center, flex-start, flex-end'],
+      ['align-items','Eixo vertical ↕','center, flex-start, flex-end, stretch'],
+      ['height: 100vh','Body ocupa a tela toda','vh = viewport height'],
+      ['margin: 0','Remove margem padrão do body','evita barra de scroll lateral'],
+    ],
+    dicas:[
+      'O body precisa de height:100vh para ter altura real e conseguir centralizar na vertical.',
+      'justify-content:center centraliza na horizontal.',
+      'align-items:center centraliza na vertical.',
+      'Tente justify-content:flex-end para empurrar o box para a direita.',
+      'Remova align-items e veja o box subir para o topo.',
+    ],
+    posmap: false
+  },
+  {
+    label:'Etapa 3 de 6', titulo:'Posicionar em qualquer ponto',
+    desc:'Com <code>position: relative</code> no <code>body</code> e <code>position: absolute</code> no box, use <code>top</code>, <code>right</code>, <code>bottom</code> e <code>left</code>. Use o mapa de 9 pontos para explorar!',
+    conceito:`body {
+  position: relative; /* referência para filhos */
+  height: 100vh;
+  margin: 0;
+}
+.meubox {
+  position: absolute; /* sai do fluxo normal */
+  top: 0;             /* distância do topo */
+  left: 0;            /* distância da esquerda */
+}`,
+    css:`body {
+  position: relative;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f4f8;
+}
+
+.meubox {
+  width: 90px;
+  height: 90px;
+  background-color: #e67e22;
+  color: white;
+  font-size: 12px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+}`,
+    props:[
+      ['position: absolute','Posiciona livremente','relativo ao ancestral com position:relative'],
+      ['position: relative','Define referência para filhos','coloque no body ou container pai'],
+      ['top / bottom','Distância do topo ou base','0, 16px, 50%'],
+      ['left / right','Distância esquerda ou direita','0, 16px, auto'],
+      ['transform: translate(...)','Ajuste fino','translate(-50%,-50%) para centro exato'],
+    ],
+    dicas:[
+      'Clique nos 9 botões do mapa abaixo do preview — o CSS é gerado automaticamente!',
+      'top:0; left:0 → canto superior esquerdo.',
+      'bottom:0; right:0 → canto inferior direito.',
+      'Para o centro exato: top:50%; left:50%; transform:translate(-50%,-50%).',
+      'position:absolute retira o elemento do fluxo — outros elementos o ignoram.',
+    ],
+    posmap: true
+  },
+  {
+    label:'Etapa 4 de 6', titulo:'Preencher a largura horizontal',
+    desc:'Use <code>width: 100%</code> para o box ocupar toda a largura do <code>body</code>. Com <code>margin:0</code> no body, não há espaço nas bordas.',
+    conceito:`body {
+  margin: 0; /* sem espaço lateral */
+}
+.meubox {
+  width: 100%;  /* 100% da largura do body */
+  height: 60px; /* altura fixa */
+}`,
+    css:`body {
+  margin: 0;
+  background-color: #ecf0f1;
+}
+
+.meubox {
+  width: 100%;
+  height: 60px;
+  background-color: #27ae60;
+  color: white;
+  font-size: 14px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}`,
+    props:[
+      ['width: 100%','Ocupa 100% da largura do pai','responsivo, se adapta à tela'],
+      ['width: 50%','Metade da largura','útil para layouts em colunas'],
+      ['max-width','Limita a largura máxima','max-width: 600px'],
+      ['box-sizing: border-box','Padding incluído no width','evita o box "vazar" para fora'],
+    ],
+    dicas:[
+      'width:100% = largura do body. margin:0 no body evita barra de scroll horizontal.',
+      'Tente width:80% e veja o box não ocupar tudo.',
+      'max-width:400px evita que o box fique enorme em telas largas.',
+      'box-sizing:border-box é boa prática — o padding fica dentro do width.',
+    ],
+    posmap: false
+  },
+  {
+    label:'Etapa 5 de 6', titulo:'Preencher a altura vertical',
+    desc:'Use <code>height: 100vh</code> no box para ocupar toda a altura da tela, ou <code>height: 100%</code> se o <code>body</code> tiver altura definida.',
+    conceito:`body {
+  margin: 0;
+  height: 100vh; /* body = altura da tela */
+}
+.meubox {
+  width: 80px;
+  height: 100%; /* herda a altura do body */
+}`,
+    css:`body {
+  margin: 0;
+  height: 100vh;
+  background-color: #ecf0f1;
+  display: flex;
+}
+
+.meubox {
+  width: 80px;
+  height: 100%;
+  background-color: #c0392b;
+  color: white;
+  font-size: 12px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  writing-mode: vertical-rl;
+}`,
+    props:[
+      ['height: 100vh','100% da altura da viewport','funciona independente do pai'],
+      ['height: 100%','100% da altura do pai','pai precisa ter height definida'],
+      ['min-height: 100vh','Altura mínima da tela','cresce se o conteúdo pedir'],
+      ['writing-mode: vertical-rl','Texto na vertical','apenas para demonstração'],
+    ],
+    dicas:[
+      'height:100% só funciona se o pai tiver uma altura definida.',
+      '100vh é sempre relativo à janela do browser — independente do pai.',
+      'Tente height:50vh para ocupar metade da tela.',
+      'min-height:100vh é o padrão de páginas que precisam cobrir a tela inteira.',
+    ],
+    posmap: false
+  },
+  {
+    label:'Etapa 6 de 6', titulo:'Ocupar a tela inteira',
+    desc:'Combine <code>position: absolute</code> com <code>inset: 0</code> — atalho moderno para <code>top:0; right:0; bottom:0; left:0</code>. O box cobre o <code>body</code> inteiro.',
+    conceito:`body {
+  position: relative;
+  height: 100vh; margin: 0;
+}
+.meubox {
+  position: absolute;
+  inset: 0; /* = top/right/bottom/left: 0 */
+}`,
+    css:`body {
+  position: relative;
+  height: 100vh;
+  margin: 0;
+}
+
+.meubox {
+  position: absolute;
+  inset: 0;
+  background-color: #2c3e50;
+  color: #ecf0f1;
+  font-size: 18px;
+  font-weight: bold;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}`,
+    props:[
+      ['inset: 0','Atalho para top/right/bottom/left:0','suporte em todos os browsers modernos'],
+      ['inset: 16px','Margem uniforme ao redor','equivale a todos os lados com 16px'],
+      ['position: absolute','Posiciona livre no pai','pai precisa de position:relative'],
+      ['z-index','Controla a camada (frente/trás)','z-index:2 fica na frente do z-index:1'],
+    ],
+    dicas:[
+      'inset:0 é o mesmo que: top:0; right:0; bottom:0; left:0 — só mais curto.',
+      'Tente inset:20px para deixar um espaço ao redor.',
+      'z-index controla qual elemento fica na frente quando há sobreposição.',
+      'Combine dois boxes com z-index diferentes para ver a sobreposição em ação!',
+    ],
+    posmap: false
+  }
+];
+
+const POSICOES = [
+  { icon:'↖', nome:'topo esquerdo',   props:'top: 0;\n  left: 0;' },
+  { icon:'↑', nome:'topo centro',     props:'top: 0;\n  left: 50%;\n  transform: translateX(-50%);' },
+  { icon:'↗', nome:'topo direito',    props:'top: 0;\n  right: 0;' },
+  { icon:'←', nome:'meio esquerdo',   props:'top: 50%;\n  left: 0;\n  transform: translateY(-50%);' },
+  { icon:'◉', nome:'centro',          props:'top: 50%;\n  left: 50%;\n  transform: translate(-50%, -50%);' },
+  { icon:'→', nome:'meio direito',    props:'top: 50%;\n  right: 0;\n  transform: translateY(-50%);' },
+  { icon:'↙', nome:'base esquerda',   props:'bottom: 0;\n  left: 0;' },
+  { icon:'↓', nome:'base centro',     props:'bottom: 0;\n  left: 50%;\n  transform: translateX(-50%);' },
+  { icon:'↘', nome:'base direita',    props:'bottom: 0;\n  right: 0;' },
+];
+
+let etapa = 0, dicaI = 0, guideOpen = true, selPos = 0;
+let primeiraCarga = true;
+const done = new Set();
+const editor = document.getElementById('editor');
+const frame  = document.getElementById('preview-frame');
+
+function iframeHTML(css) {
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><style>*,*::before,*::after{box-sizing:border-box;}${css}</style></head><body><div class="meubox">meu box</div></body></html>`;
+}
+
+function aplicar(silente) {
+  frame.srcdoc = iframeHTML(editor.value);
+  if (!silente) fb('ok','ti-check','CSS aplicado com sucesso!');
+}
+
+function resetar() {
+  editor.value = E[etapa].css;
+  if (E[etapa].posmap) { selPos=0; buildPosmap(); }
+  aplicar(true);
+  fb('idle','ti-refresh','CSS restaurado para o exemplo da etapa.');
+}
+
+function dica() {
+  const ds = E[etapa].dicas;
+  fb('hint','ti-bulb', ds[dicaI % ds.length]);
+  dicaI++;
+}
+
+function abrirModalCodigo() {
+  const modal = document.getElementById('codigo-modal');
+  const titulo = document.getElementById('codigo-modal-titulo');
+  const conteudo = document.getElementById('codigo-modal-conteudo');
+  const e = E[etapa];
+  titulo.textContent = `Código da ${e.label}`;
+  conteudo.textContent = e.css;
+  modal.classList.add('aberto');
+}
+
+function fecharModalCodigo(event) {
+  if (event && event.target !== event.currentTarget) return;
+  document.getElementById('codigo-modal').classList.remove('aberto');
+}
+
+function copiarCodigoModal() {
+  const conteudo = document.getElementById('codigo-modal-conteudo').textContent;
+  navigator.clipboard.writeText(conteudo)
+    .then(() => fb('ok','ti-copy','Código copiado para a área de transferência.'))
+    .catch(() => fb('err','ti-alert-circle','Não foi possível copiar automaticamente.'));
+}
+
+function fb(tipo, icon, msg) {
+  const bar = document.getElementById('fbbar');
+  bar.className = 'fbbar '+tipo;
+  bar.innerHTML = `<i class="ti ${icon}"></i> <span>${msg}</span>`;
+}
+
+function pills() {
+  const w = document.getElementById('pills');
+  w.innerHTML = '';
+  E.forEach((_,i) => {
+    const b = document.createElement('button');
+    b.className = 'pill'+(i===etapa?' active':'')+(done.has(i)&&i!==etapa?' done':'');
+    b.textContent = i+1; b.title = E[i].titulo;
+    b.onclick = () => ir(i);
+    w.appendChild(b);
+  });
+}
+
+function propTable() {
+  const tb = document.getElementById('ptbody');
+  tb.innerHTML = '';
+  E[etapa].props.forEach(([p,d,ex]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${p}</td><td>${d}</td><td>${ex}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function buildPosmap() {
+  const sec = document.getElementById('posmap-section');
+  sec.style.display = E[etapa].posmap ? '' : 'none';
+  if (!E[etapa].posmap) return;
+  const map = document.getElementById('posmap');
+  map.innerHTML = '';
+  POSICOES.forEach((p,i) => {
+    const cell = document.createElement('div');
+    cell.className = 'posmap-cell'+(i===selPos?' sel':'');
+    cell.textContent = p.icon; cell.title = p.nome;
+    cell.onclick = () => { selPos=i; buildPosmap(); aplicarPosmap(i); };
+    map.appendChild(cell);
+  });
+  const info = document.getElementById('posmap-info');
+  info.innerHTML = `<strong>${POSICOES[selPos].nome}</strong><code>${POSICOES[selPos].props.replace(/\n/g,'<br>')}</code>`;
+}
+
+function aplicarPosmap(idx) {
+  const p = POSICOES[idx];
+  editor.value = `body {
+  position: relative;
+  height: 100vh;
+  margin: 0;
+  background-color: #f0f4f8;
+}
+
+.meubox {
+  width: 90px;
+  height: 90px;
+  background-color: #e67e22;
+  color: white;
+  font-size: 12px;
+  font-family: sans-serif;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: absolute;
+  ${p.props}
+}`;
+  aplicar(true);
+  fb('hint','ti-map-pin',`Posição: ${p.nome}`);
+}
+
+function load(idx) {
+  const e = E[idx];
+  document.getElementById('slabel').textContent = e.label;
+  document.getElementById('stitle').textContent = e.titulo;
+  document.getElementById('sdesc').innerHTML  = e.desc;
+  document.getElementById('concept-code').innerHTML = e.conceito;
+  editor.value = '';
+  primeiraCarga = false;
+  dicaI = 0; selPos = 0;
+  propTable(); buildPosmap();
+  aplicar(true);
+  document.getElementById('progfill').style.width = ((idx+1)/E.length*100)+'%';
+  document.getElementById('btnprev').style.display = idx===0?'none':'';
+  const nb = document.getElementById('btnnext');
+  if (idx===E.length-1) {
+    nb.innerHTML = '<i class="ti ti-check"></i> Concluir!';
+    nb.onclick = concluir;
+  } else {
+    nb.innerHTML = 'Próxima etapa <i class="ti ti-arrow-right"></i>';
+    nb.onclick = proximo;
+  }
+  document.getElementById('navlabel').innerHTML = idx<E.length-1
+    ? `<span style="font-size:11px;color:var(--tx2)">Etapa ${idx+1} de ${E.length}</span>`
+    : `<span class="complete-badge"><i class="ti ti-star"></i> Última etapa!</span>`;
+  fb('idle','ti-info-circle','Escreva o CSS e clique em Aplicar.');
+  pills();
+}
+
+function ir(idx)    { etapa=idx; load(idx); }
+function proximo()  { done.add(etapa); if(etapa<E.length-1){etapa++;load(etapa);} }
+function anterior() { if(etapa>0){etapa--;load(etapa);} }
+function concluir() { done.add(etapa); pills(); document.getElementById('conquest').classList.add('show'); fb('ok','ti-trophy','Parabéns! Todas as etapas concluídas!'); }
+
+function toggleGuide() {
+  guideOpen=!guideOpen;
+  document.getElementById('ginner').style.display=guideOpen?'':'none';
+  document.getElementById('gchev').style.transform=guideOpen?'':'rotate(-90deg)';
+}
+
+editor.addEventListener('keydown', ev => {
+  if (ev.ctrlKey && ev.key==='Enter') { ev.preventDefault(); aplicar(); }
+  if (ev.key==='Escape') {
+    fecharModalCodigo();
+  }
+  if (ev.key==='Tab') {
+    ev.preventDefault();
+    const s=editor.selectionStart;
+    editor.value=editor.value.substring(0,s)+'  '+editor.value.substring(editor.selectionEnd);
+    editor.selectionStart=editor.selectionEnd=s+2;
+  }
+});
+
+load(0);
+</script>
+</body>
+</html>
